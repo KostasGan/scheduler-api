@@ -2,7 +2,7 @@ const db = require('../helpers/db');
 const Promise = require('bluebird');
 const Schema = db.mongoose.Schema;
 
-let new_user;
+let user, new_user;
 
 let UserSchema = new Schema({
     email: { type: String, required: true },
@@ -22,9 +22,8 @@ UserSchema.statics.UpdateUser = (email,token) => {
     });
 }
 
-UserSchema.statics.CreateUser = (user) => {
-    new_user = new user(user.email, user.ac_token, user.friends_list || []);
-
+UserSchema.statics.CreateUser = (email, access_token, friends_list) => {
+    new_user = new user({ email: email, ac_token: access_token, friends_list: friends_list || []});
     return new_user.save().then(() => {
         return 'Complete';
     }).catch((e) => {
@@ -33,7 +32,7 @@ UserSchema.statics.CreateUser = (user) => {
     });
 }
 
-let user = db.mongoose.model('calendar_users', UserSchema);
+user = db.mongoose.model('calendar_users', UserSchema);
 
 exports.Model = user;
 

@@ -42,7 +42,7 @@ exports.authorizeClient = (credentials, access_token) => {
                 
                 if (resp.audience === credentials.client_id) {
                     userModel.findUser(resp.email).then((user) => {
-                        if (user) {
+                        if (user && user.ac_token !== access_token) {
                             userModel.UpdateUser(resp.email, access_token.trim());
                         }
                         else {

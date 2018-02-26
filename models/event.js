@@ -7,7 +7,9 @@ let EventSchema = new Schema({
     summary: { type: String, required: true },
     description: { type: String },
     startDate: { type: Date, required: true },
-    endDate: { type: Date, required: true }
+    startHour: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    endDateHour: { type: Date, required: true }
 });
 
 exports.Event = class Event {
@@ -18,8 +20,11 @@ exports.Event = class Event {
         this.endDate = endDate;
     }
 
-    getSummary() { return this.summary; }
-    getStartDate() { return this.startDate; }
-    getEndDate() { return this.endDate; }
+    DateToTimeStamp(date) { 
+        return new Date(date).getTime(); 
+    }
 
+    GetHours() { 
+        return new Date(date).getHours() ; 
+    }
 };
