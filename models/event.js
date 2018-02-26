@@ -2,7 +2,9 @@ const db = require('../helpers/db');
 const Promise = require('bluebird');
 const Schema = db.mongoose.Schema;
 
-let EventSchema = new Schema({
+const event;
+
+const EventSchema = new Schema({
     email: { type: String, required: true },
     summary: { type: String, required: true },
     description: { type: String },
@@ -12,19 +14,23 @@ let EventSchema = new Schema({
     endDateHour: { type: Date, required: true }
 });
 
-exports.Event = class Event {
-    constructor(summary, description, startDate, endDate){
-        this.summary = summary;
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
+const EventListSchema = new Schema({
+    email: { type: String, required: true },
+    events: { type: [EventSchema], required: true }
+});
 
-    DateToTimeStamp(date) { 
-        return new Date(date).getTime(); 
-    }
 
-    GetHours() { 
-        return new Date(date).getHours() ; 
-    }
-};
+EventSchema.statics.DateToTime = () => {
+    Promise.map(this.event, (event) => {
+        return {
+            event: this.event,
+            startDateTime: startDate.getTime(),
+            endDateTime: endDate.getTime()
+        };
+    }).then((fevent)=>{
+        Promise.resolve(fevent);
+    });
+}
+
+event = db.mongoose.model('events', EventSchema);
+exports.Model = event;
