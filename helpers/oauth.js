@@ -4,26 +4,12 @@ const request = require('request');
 const Promise = require('bluebird');
 const userModel = require('../models/user').Model;
 
-let resp;
+let resp, options;
+let url = 'https://www.googleapis.com/oauth2/v2/tokeninfo';
 
-// exports.authorize = (credentials, SCOPES) => {
-//     var clientSecret = credentials.client_secret;
-//     var clientId = credentials.client_id;
-//     var redirectUrl = credentials.redirect_uris[0];
-//     var auth = new googleAuth();
-//     var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
-
-//     var authUrl = oauth2Client.generateAuthUrl({
-//         access_type: 'offline',
-//         scope: SCOPES
-//     });
-
-//     return { "url": authUrl, "oauth2Client": oauth2Client };
-// };
 
 exports.authorizeClient = (credentials, access_token) => {
-    let url = 'https://www.googleapis.com/oauth2/v2/tokeninfo';
-    let options = {
+    options = {
         'url': url,
         'form': {
             'access_token': access_token.trim() || ''
@@ -44,6 +30,7 @@ exports.authorizeClient = (credentials, access_token) => {
                     userModel.findUser(resp.email).then((user) => {
                         if (user && user.ac_token !== access_token) {
                             userModel.UpdateUser(resp.email, access_token.trim());
+                            resolve({ 'status': 'Validated User' });
                         }
                         else {
                             userModel.CreateUser(resp.email, access_token.trim()).then((val) => {
