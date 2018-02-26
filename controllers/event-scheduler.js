@@ -1,18 +1,18 @@
 const google = require('googleapis');
 const googleAuth = require('google-auth-library');
 const Promise = require('bluebird');
+const moment = require('moment');
 
 let auth = new googleAuth();
 let calendar = google.calendar('v3');
+let unAuthUsers = [];
+let oauth2Client;
 
 
-exports.GetCalendarEvents = (credentialss, ac_token) => {
-    let clientSecret = credentialss.client_secret;
-    let clientId = credentialss.client_id;
-    let redirectUrl = credentialss.redirect_uris;
-    let oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+
+exports.GetCalendarEvents = (credentials, ac_token) => {
+    oauth2Client = new auth.OAuth2(credentials.client_id, credentials.client_secret, credentials.redirect_uris);
     oauth2Client.credentials = {"access_token": ac_token};
-    //console.log(oauth2Client);
 
     calendar.events.list({
         auth: oauth2Client,
@@ -26,22 +26,24 @@ exports.GetCalendarEvents = (credentialss, ac_token) => {
             console.log('The API returned an error: ' + err);
             return;
         }
-        //var events = response.items;
-        //console.log(response.items[0].start.dateTime);
-    
-         let startData = new Date((response.items[0].start.dateTime));
-         let endData = new Date((response.items[0].end.dateTime));
+        var events = response.items;
+        if (events.length == 0) {
+            console.log('No upcoming events found.');
+            return new Promise((resolve, reject) => { resolve([])})
+        } else {
+            // return Promise.map(events, (event) => {
+            //     let structure = {
+            //         email: '',
+            //         summary: '',
+            //         description: '',
+            //         startDate: new Date(event.start.date),
+            //         startHour: new Date(event.start.dateTime),
+            //         endDate: new Date(event.end.date),
+            //         endDate: new Date(event.end.dateTime)
+            //     };
 
-        console.log(startData.getHours() - endData.getHours());
-        // if (events.length == 0) {
-        //     console.log('No upcoming events found.');
-        // } else {
-        //     console.log('Upcoming 10 events:');
-        //     for (var i = 0; i < events.length; i++) {
-        //         var event = events[i];
-        //         var start = event.start.dateTime || event.start.date;
-        //         console.log('%s - %s', start, event.summary);
-        //     }
-        // }
+
+            // });
+        }
     });
 }
