@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Google Calendar API Quickstart</title>
+    <meta charset='utf-8' />
+
+    <script async defer src="https://apis.google.com/js/platform.js?onload=handleClientLoad">
+    </script>
+
+    <script type="text/javascript">
+      // Client ID and API key from the Developer Console
+      var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
+
+      // Array of API discovery doc URLs for APIs used by the quickstart
+      var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+
+      function onSuccess(googleUser) {
+        let access_token = googleUser.getAuthResponse().access_token;
+        let xhr = new XMLHttpRequest();
+          xhr.open('POST',
+              'http://localhost:8080/gauthredirect');
+          xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          xhr.onreadystatechange = function (e) {
+            console.log(gapi.auth2.getAuthInstance().isSignedIn.get());
+            if(e.status === 'Failed'){
+              var pre = document.getElementById('content');
+              var textContent = document.createTextNode('Unauthorized \n');
+              pre.appendChild(textContent);
+            }
+            else{
+              var pre = document.getElementById('content');
+              var textContent = document.createTextNode(access_token + '\n');
+              pre.appendChild(textContent);
+            }
+          };
+          xhr.send('access_token='+ access_token);
+      }
+
+      function onFailure(error){
+        console.log(error);
+      }
+      
+      function handleClientLoad(){
+        gapi.load('auth2', initClient);
+      }
+
+      function initClient() {
+        auth2 = gapi.auth2.init({
+          'client_id': CLIENT_ID,
+          'prompt': 'select_account'
+        })
+
+        gapi.signin2.render('authorize-button', {
+          'scope': SCOPES,
+          'width': 250,
+          'height': 40,
+          'longtitle': true,
+					'theme': 'light',
+					'onsuccess': onSuccess,
+					'onfailure': onFailure
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <p>Google Calendar API Quickstart</p>
+
+    <!--Add buttons to initiate auth sequence and sign out-->
+    <div id="authorize-button"> </div>
+    <button id="signout-button" style="display: none;">Sign Out</button>
+
+    <pre id="content"></pre>
+    <pre id="error"></pre>
+  </body>
+</html>
