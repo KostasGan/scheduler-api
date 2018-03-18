@@ -2,7 +2,8 @@ const db = require('../helpers/db');
 const Promise = require('bluebird');
 const Schema = db.mongoose.Schema;
 
-const user, new_user;
+let user;
+let new_user;
 
 const UserSchema = new Schema({
     email: { type: String, required: true },
