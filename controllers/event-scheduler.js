@@ -17,12 +17,16 @@ exports.GetCalendarEvents = (oauth2Client) => {
     }, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
-            return;
+            return new Promise((resolve, reject) => { 
+                reject({
+                    "message": err
+                });
+            });
         }
         var events = response.items;
         if (events.length == 0) {
             console.log('No upcoming events found.');
-            return new Promise((resolve, reject) => { resolve([])})
+            return new Promise((resolve, reject) => { resolve([])});
         } else {
             new Promise.map(events, (event) => {
                 return {
