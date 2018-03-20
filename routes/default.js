@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const auth = require('../helpers/oauth');
 const ev_controler = require('../controllers/event-scheduler');
 
-
 function initGoogleAuth(credentials, ac_token){
     let auth = new googleAuth();
 
@@ -30,7 +29,9 @@ exports.registerRoutes = function(app, config) {
             return; 
         }
         let oauth2Client = initGoogleAuth(credentials, access_token);
-        ev_controler.GetCalendarEvents(oauth2Client);
+        ev_controler.GetCalendarEvents(oauth2Client).then((val) =>{
+            res.json(val);
+        });
     });
 
     app.post('/gauthredirect', (req, res) => {
