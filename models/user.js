@@ -33,6 +33,17 @@ UserSchema.statics.CreateUser = (email, access_token, friends_list) => {
     });
 }
 
+UserSchema.statics.findFriendsAccessToken = (friends_list) => {
+    let friends = friends_list.split(',');
+
+    return new Promise.map(friends, (friend) => {
+        user.findUser(friend).then((friendData) => {
+            return friendData.ac_token;
+        });
+    });
+}
+
+
 user = db.mongoose.model('calendar_users', UserSchema);
 
 exports.Model = user;
