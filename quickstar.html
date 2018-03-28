@@ -20,9 +20,7 @@
         let login = gapi.auth2.getAuthInstance().isSignedIn.get();
 
         if(login){
-          /**
-          * TODO 
-          */
+          window.location = '/home';
         }
 
         let xhr = new XMLHttpRequest();
