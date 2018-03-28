@@ -38,7 +38,10 @@ UserSchema.statics.findFriendsAccessToken = (friends_list) => {
 
     return new Promise.map(friends, (friend) => {
         user.findUser(friend).then((friendData) => {
-            return friendData.ac_token;
+            return{
+                "email": friend,
+                "access_token": friendData.ac_token
+            };
         });
     });
 }
