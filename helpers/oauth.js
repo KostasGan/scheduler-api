@@ -4,10 +4,10 @@ const userModel = require('../models/user').Model;
 
 let resp, options;
 let url = 'https://www.googleapis.com/oauth2/v2/tokeninfo';
-
+let access_token;
 
 exports.authorizeClient = (oauth2Client) => {
-    let access_token = oauth2Client.credentials.access_token;
+    access_token = oauth2Client.credentials.access_token;
     options = {
         'url': url,
         'form': {
@@ -24,8 +24,7 @@ exports.authorizeClient = (oauth2Client) => {
                 catch(e){ 
                     console.log('JSON parse failed \n' + e);
                 }
-                
-                if (resp.audience === oauth2Client.client_id) {
+                if (resp.audience === oauth2Client.clientId_) {
                     userModel.findUser(resp.email).then((user) => {
                         if (user && user.ac_token !== access_token) {
                             userModel.UpdateUser(resp.email, access_token);
@@ -41,12 +40,58 @@ exports.authorizeClient = (oauth2Client) => {
                                 }
                             });
                         }
+                    }).catch((e) => {
+                        console.log(e);
+                    });
+                }
+                else{
+                    reject({
+                        "status": "error",
+                        "error_code": "bad_request"
                     });
                 }
             }
             else {
-                resolve({ 'status': 'Failed' });
+                reject({ 'status': 'Failed' });
             }
         });
     });
 };
+
+
+exports.checkAuthToken = (oauth2Client) => {
+    access_token = oauth2Client.credentials.access_token;
+    options = {
+        'url': url,
+        'form': {
+            'access_token': access_token || ''
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+        request.post(options, function (error, response, body) {
+            let data = JSON.parse(body);
+            if(!error && response.statusCode === 400 && data.error_description === "Invalid Value"){
+                resolve({
+                    "status": "success",
+                    "message": "Invalid Credentials"
+                });
+                return;
+            }
+            else if(!error && response.statusCode === 200){
+                resolve({
+                    "status": "success",
+                    "message": "Valid User"
+                });
+                return;
+            }
+            else{
+                reject({
+                    "status": "error",
+                    "message": (JSON.parse(body)).error_description
+                });
+                return;
+            }
+        });
+    });
+}
