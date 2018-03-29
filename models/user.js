@@ -14,6 +14,9 @@ const UserSchema = new Schema({
 UserSchema.statics.findUser = function(email) {
     return user.findOne({ email: email }).then((user) => {
         return user;
+    }).catch((e) => {
+        console.log('We have a problem \n' + e);
+        return 'Failed';
     });
 }
 
@@ -25,23 +28,25 @@ UserSchema.statics.UpdateUser = (email,token) => {
 
 UserSchema.statics.CreateUser = (email, access_token, friends_list) => {
     new_user = new user({ email: email, ac_token: access_token, friends_list: friends_list || []});
-    return new_user.save().then(() => {
-        return 'Complete';
+    return new_user.save().then((s) => {
+        return new_user;
     }).catch((e) => {
         console.log('We have a problem \n' + e);
         return 'Failed';
     });
 }
 
-UserSchema.statics.findFriendsAccessToken = (friends_list) => {
-    let friends = friends_list.split(',');
+UserSchema.statics.findFriendsAccessToken = (friends_emails) => {
+    let friends_email_list = friends_emails.split(',');
 
-    return new Promise.map(friends, (friend) => {
-        user.findUser(friend).then((friendData) => {
-            return{
-                "email": friend,
-                "access_token": friendData.ac_token
+    return new Promise.map(friends_email_list, (friend_mail) => {
+        return user.findUser(friend_mail).then((friend) => {
+            if(friend === null){
+                console.log('Create New User');
+                return user.CreateUser(friend_mail, " ", []);
             };
+            
+            return friend;
         });
     });
 }
