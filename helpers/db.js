@@ -5,7 +5,11 @@ const Schema = mongoose.Schema;
 
 
 let uri = config.get('db.host') + ':' + config.get('db.port') + '/' + config.get('db.db_name');
-mongoose.connect(uri, { useMongoClient: true }).then(() => {
+mongoose.connection.openUri(uri, { 
+    autoReconnect: true,
+    reconnectTries: 5,
+    reconnectInterval: 500 
+}).then(() => {
     console.log('Connection to MongoDB established!');
 }).catch((e) => {
     console.log('Problem with the connection \n' + e);
