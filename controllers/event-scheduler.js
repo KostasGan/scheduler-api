@@ -11,7 +11,7 @@ exports.GetCalendarEvents = (oauth2Client) => {
             calendarId: 'primary',
             timeMin: (new Date(2018,02,01,10)).toISOString(),
             timeMax: (new Date(2018,02,28,18)).toISOString(),
-            maxResults: 10,
+            maxResults: 1,
             singleEvents: true,
             orderBy: 'startTime'
         }, function (err, response) {
