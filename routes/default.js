@@ -23,7 +23,7 @@ exports.registerRoutes = function(app, config) {
         // let endDate = req.body.endDate || '';
         // let availableTime = req.body.availableTime || '';
         // let friends_list = req.body.friends_list || '';
-        let friends_list = 'kostas.efood@gmail.com,doctorkos69@gmail.com'
+        let friends_list = 'kostas.efood@gmail.com'
         access_token = req.body.access_token || '';
 
         if(access_token === ''){
@@ -34,44 +34,49 @@ exports.registerRoutes = function(app, config) {
         let oauth2Client = initGoogleAuth(credentials);
 
         userModel.findFriendsAccessToken(friends_list).then((friends) => {
-            new Promise.map(friends, (friend) => {
+            return Promise.filter(friends, (friend) => {
                 oauth2Client.credentials = {"access_token": friend.ac_token};
 
                 return auth.checkAuthToken(oauth2Client).then((val) =>{
                     if(val.message === "Invalid Credentials"){
                         return friend.email;
                     }
+                    return;
                 });
+            }).map((user) =>{
+                return user.email;
             }).then((unAuthUsers) =>{
                 return {
                     friend: friends,
                     unAuthUsers: unAuthUsers
                 }
-            }).then((obj) => {
-                //console.log(obj);
-                if (obj.unAuthUsers.length >= 1){
-                    console.log(obj.unAuthUsers);
-                    res.status(401);
-                    res.json({
-                        status: "error",
-                        error_code: "unauthorized_friends",
-                        message: "Some of friendList's users need Authorization",
-                        data : {
-                            users:obj.unAuthUsers
-                        }
-                    });
-                    return;
-                }
             });
+        }).then((obj) => {;
+            if (obj.unAuthUsers.length >= 1){
+                console.log(obj.unAuthUsers);
+                res.status(401);
+                res.json({
+                    status: "error",
+                    error_code: "unauthorized_friends",
+                    message: "Some of friendList's users need Authorization",
+                    data : {
+                        users:obj.unAuthUsers
+                    }
+                });
+                return;
+            }
+            else{
+                oauth2Client.credentials = {"access_token": access_token};
+                ev_controler.GetCalendarEvents(oauth2Client).then((val) =>{
+                    Promise.each(obj.friend, (us) => {
+                        oauth2Client.credentials = {"access_token": us.ac_token};
+                        ev_controler.GetCalendarEvents(oauth2Client).then((es) => { console.log(es); console.log(val);})
+                    });
+                }).catch((e) => {
+                    console.log(e);
+                });
+            }
         });
-
-        // let oauth2Client = initGoogleAuth(credentials, access_token);
-        // ev_controler.GetCalendarEvents(oauth2Client).then((val) =>{
-        //     res.json(val);
-        // }).catch((error) => {
-        //     res.status(401);
-        //     res.json(error);
-        // });
     });
 
     app.post('/gauthredirect', (req, res) => {
@@ -82,7 +87,8 @@ exports.registerRoutes = function(app, config) {
             res.json({message: 'No access token. Please try again!'});
             return;
         }
-        let oauth2Client = initGoogleAuth(credentials, access_token);
+        let oauth2Client = initGoogleAuth(credentials);
+        oauth2Client.credentials = {"access_token": access_token};
         auth.authorizeClient(oauth2Client).then((val) =>{
             res.json(val);
         }).catch((error) => {
