@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Google Calendar API Quickstart</title>
+    <title>Event Scheduler</title>
     <meta charset='utf-8' />
-
+    <!--link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous"-->
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
     <script async defer src="https://apis.google.com/js/platform.js?onload=handleClientLoad">
     </script>
 
@@ -20,7 +21,7 @@
         let login = gapi.auth2.getAuthInstance().isSignedIn.get();
 
         if(login){
-          window.location = '/home';
+          // window.location.pathname = '/home.html';
         }
 
         let xhr = new XMLHttpRequest();
@@ -43,7 +44,7 @@
       };
 
       function onFailure(error){
-        console.log(error);
+        document.getElementById('error').innerHTML = 'Please make sure you sign in via Google';
       };
       
       function initClient() {
@@ -57,7 +58,6 @@
 					'onfailure': onFailure
         });
       };
-
       function handleClientLoad(){
         gapi.load('auth2', () => {
           gapi.auth2.init({
@@ -68,9 +68,14 @@
               initClient();
             }
             else{
-              //window.location.replace('https://www.e-food.gr');
+              // window.location.pathname = '/home';
+              console.log('skatataa');
             }
+          }).catch((e) =>{
+            console.log( '1' + e)
           });
+        }, (e) => {
+          console.log(e);
         });
       };
       
@@ -80,13 +85,14 @@
     </script>
   </head>
   <body>
-    <p>Google Calendar API Quickstart</p>
-
     <!--Add buttons to initiate auth sequence and sign out-->
-    <div id="authorize-button"> </div>
-    <button id="signout-button" style="display: none;">Sign Out</button>
-
-    <pre id="content"></pre>
-    <pre id="error"></pre>
+    <div class="flex">
+      <div class="box-login" > 
+        <img src="calendar-icon.png" width="100" height="100"> 
+        <p>Event Scheduler Login</p>
+        <div id="authorize-button"> </div>
+        <div id="error"></div>
+      </div>
+    </div>
   </body>
 </html>
