@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Event Scheduler</title>
+    <meta charset='utf-8' />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <script async defer src="https://apis.google.com/js/platform.js?onload=handleClientLoad"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <style>
+        body{
+            background-color: lightgrey;
+            overflow-x: hidden;
+        }
+        .container{
+            text-align: center;
+            margin-top: 5%;
+            vertical-align: auto
+        }
+        .container div{
+            padding: 0px;
+        }
+        .btn{
+            height: 30px;
+            width: 120px;
+            padding: 0px;
+            vertical-align: inherit
+        }
+        span{
+           font-size: 15px;
+        }
+        input, button{
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+
+    <script>
+        var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
+
+        function handleClientLoad() {
+            gapi.load('auth2', () => {
+                gapi.auth2.init({
+                    'client_id': CLIENT_ID
+                }).then((googleAuth) => {
+                    console.log(googleAuth.isSignedIn);
+                    if (!googleAuth.isSignedIn.get()) {
+                        // window.location.pathname = '/quickstar.html';
+                        
+                    }
+                    else {
+                        // window.location.pathname = '/home';
+                        console.log('skatataa11');
+                    }
+                }).catch((e) => {
+                    console.log('1' + e)
+                });
+            }, (e) => {
+                console.log(e);
+            });
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-8 col-sm-8 col-md-12 col-lg">
+                <span> Εναρξη </span>
+                <input type="text">
+            </div>
+            <div class="col-8 col-sm-8 col-md-12 col-lg">
+                <span> Ληξη </span>
+                <input type="text">
+            </div>
+            <div class="col-8 col-sm-10 col-md-12 col-lg">
+                <span> Διαθέσιμες Ωρες </span>
+                <input type="text">
+            </div>
+            <div class="col-8 col-sm-10 col-md-12 col-lg">
+                <span> Συμμετεχοντες </span>
+                <input type="text">
+            </div>
+            <div class="col-8 col-sm-12 col-md-10 col-lg">
+                <button class="btn btn-primary" type="submit">Υποβολη</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
