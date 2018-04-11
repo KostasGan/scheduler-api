@@ -13,77 +13,93 @@
             overflow-x: hidden;
         }
         .container{
-            text-align: center;
+
             margin-top: 5%;
             vertical-align: auto
         }
         .container div{
             padding: 0px;
+
         }
         .btn{
             height: 30px;
             width: 120px;
             padding: 0px;
-            vertical-align: inherit
         }
-        span{
-           font-size: 15px;
+        label{
+           text-align: inherit;
+           margin: 0;
+           padding: 0px;
         }
-        input, button{
+        button{
             margin-left: auto;
             margin-right: auto;
+        }
+        form{
+            padding: 0px;
+            margin: 0px;
         }
     </style>
 
     <script>
-        var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
+        // var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
 
-        function handleClientLoad() {
-            gapi.load('auth2', () => {
-                gapi.auth2.init({
-                    'client_id': CLIENT_ID
-                }).then((googleAuth) => {
-                    console.log(googleAuth.isSignedIn);
-                    if (!googleAuth.isSignedIn.get()) {
-                        // window.location.pathname = '/quickstar.html';
+        // function handleClientLoad() {
+        //     gapi.load('auth2', () => {
+        //         gapi.auth2.init({
+        //             'client_id': CLIENT_ID
+        //         }).then((googleAuth) => {
+        //             console.log(googleAuth.isSignedIn);
+        //             if (!googleAuth.isSignedIn.get()) {
+        //                 // window.location.pathname = '/quickstar.html';
                         
-                    }
-                    else {
-                        // window.location.pathname = '/home';
-                        console.log('skatataa11');
-                    }
-                }).catch((e) => {
-                    console.log('1' + e)
-                });
-            }, (e) => {
-                console.log(e);
-            });
-        };
+        //             }
+        //             else {
+        //                 // window.location.pathname = '/home';
+        //                 console.log('skatataa11');
+        //             }
+        //         }).catch((e) => {
+        //             console.log('1' + e)
+        //         });
+        //     }, (e) => {
+        //         console.log(e);
+        //     });
+        // };
     </script>
 </head>
 <body>
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-8 col-sm-8 col-md-12 col-lg">
-                <span> Εναρξη </span>
-                <input type="text">
+        <form >
+            <div class="form-group row">
+                <label class="col-4 col-sm-2 col-form-label"> Event Start </label>
+                <div class="col-4 col-sm-10">
+                    <input class="form-control-sm" type="text">
+                </div>
             </div>
-            <div class="col-8 col-sm-8 col-md-12 col-lg">
-                <span> Ληξη </span>
-                <input type="text">
+            <div class="form-group row">
+                <label class="col-4 col-sm-2 col-form-label"> Event End </label>
+                <div class="col-3 col-sm-10">
+                    <input class="form-control-sm" type="text">
+                </div>
             </div>
-            <div class="col-8 col-sm-10 col-md-12 col-lg">
-                <span> Διαθέσιμες Ωρες </span>
-                <input type="text">
+            <div class="form-group row">
+                <label class="col-4 col-sm-2 col-form-label"> Available Hour </label>
+                <div class="col-3 col-sm-10">
+                    <input class="form-control-sm" type="text">
+                </div>
             </div>
-            <div class="col-8 col-sm-10 col-md-12 col-lg">
-                <span> Συμμετεχοντες </span>
-                <input type="text">
+            <div class="form-group row">
+                <label class="col-4 col-sm-2 col-form-label"> Attendees </label>  
+                <div class="col-3 col-sm-10">
+                    <input class="form-control-sm" type="text">
+                </div>
             </div>
-            <div class="col-8 col-sm-12 col-md-10 col-lg">
-                <button class="btn btn-primary" type="submit">Υποβολη</button>
+            <div class="" >
+                <div class=" offset-sm-2">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </body>
 </html>
