@@ -11,11 +11,12 @@
         body{
             background-color: lightgrey;
             overflow-x: hidden;
+            font-family: sans-serif;
+            font-size: 13px;
         }
         .container{
             margin-top: 5vh;
             margin-left: 0;
-            padding: 0;
         }
         .btn{
             height: 30px;
@@ -26,15 +27,19 @@
         label{
             margin: 0;
             padding: 0px;
+            width: 100%;
         }
         button{
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto;
             
         }
+        input{
+            font-size: 12px !important;
+            height: 30px;
+        }
         form{
-            padding: 0px;
-            margin: 0px;
+            margin-left:auto;
+            margin-right:auto;
         }
     </style>
 
@@ -66,32 +71,32 @@
 </head>
 <body>
     <div class="container">
-        <form class="col-12">
+        <form class="">
             <div class="form-group row align-items-center">
-                <label class="col-form-label col-sm-2"> Event Start </label>
-                <div class="col-10 col-sm-4">
+                <label class="col-form-label col-sm-2 col-lg-1"> Event Start </label>
+                <div class="col-sm-4">
                     <input class="form-control" type="text">
                 </div>
             </div>
             <div class="form-group row align-items-center">
-                <label class="col-form-label col-sm-2"> Event End </label>
-                <div class="col-10 col-sm-4">
+                <label class="col-form-label col-sm-2 col-lg-1"> Event End </label>
+                <div class="col-sm-4">
                     <input class="form-control" type="text">
                 </div>
             </div>
             <div class="form-group row align-items-center">
-                <label class="col-form-label col-sm-2"> Available Hour </label>
-                <div class="col-10 col-sm-4">
+                <label class="col-form-label col-sm-2 col-lg-1"> Available Hour </label>
+                <div class="col-sm-4">
                     <input class="form-control" type="text">
                 </div>
             </div>
             <div class="form-group row align-items-center">
-                <label class="col-form-label col-sm-2"> Attendees </label>  
-                <div class="col-10 col-sm-4">
+                <label class="col-form-label col-sm-2 col-lg-1"> Attendees </label>  
+                <div class="col-sm-4">
                     <input class="form-control" type="text">
                 </div>
             </div>
-            <div class="row col-12">
+            <div class="col-sm-6">
                 <div class="text-center">
                     <button type="submit" class="btn btn-primary btn-lg">Submit</button>
                 </div>
