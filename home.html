@@ -13,27 +13,24 @@
             overflow-x: hidden;
         }
         .container{
-
-            margin-top: 5%;
-            vertical-align: auto
-        }
-        .container div{
-            padding: 0px;
-
+            margin-top: 5vh;
+            margin-left: 0;
+            padding: 0;
         }
         .btn{
             height: 30px;
-            width: 120px;
+            width: 150px;
             padding: 0px;
+            margin-top: 20px;
         }
         label{
-           text-align: inherit;
-           margin: 0;
-           padding: 0px;
+            margin: 0;
+            padding: 0px;
         }
         button{
             margin-left: auto;
             margin-right: auto;
+            
         }
         form{
             padding: 0px;
@@ -69,34 +66,34 @@
 </head>
 <body>
     <div class="container">
-        <form >
-            <div class="form-group row">
-                <label class="col-4 col-sm-2 col-form-label"> Event Start </label>
-                <div class="col-4 col-sm-10">
-                    <input class="form-control-sm" type="text">
+        <form class="col-12">
+            <div class="form-group row align-items-center">
+                <label class="col-form-label col-sm-2"> Event Start </label>
+                <div class="col-10 col-sm-4">
+                    <input class="form-control" type="text">
                 </div>
             </div>
-            <div class="form-group row">
-                <label class="col-4 col-sm-2 col-form-label"> Event End </label>
-                <div class="col-3 col-sm-10">
-                    <input class="form-control-sm" type="text">
+            <div class="form-group row align-items-center">
+                <label class="col-form-label col-sm-2"> Event End </label>
+                <div class="col-10 col-sm-4">
+                    <input class="form-control" type="text">
                 </div>
             </div>
-            <div class="form-group row">
-                <label class="col-4 col-sm-2 col-form-label"> Available Hour </label>
-                <div class="col-3 col-sm-10">
-                    <input class="form-control-sm" type="text">
+            <div class="form-group row align-items-center">
+                <label class="col-form-label col-sm-2"> Available Hour </label>
+                <div class="col-10 col-sm-4">
+                    <input class="form-control" type="text">
                 </div>
             </div>
-            <div class="form-group row">
-                <label class="col-4 col-sm-2 col-form-label"> Attendees </label>  
-                <div class="col-3 col-sm-10">
-                    <input class="form-control-sm" type="text">
+            <div class="form-group row align-items-center">
+                <label class="col-form-label col-sm-2"> Attendees </label>  
+                <div class="col-10 col-sm-4">
+                    <input class="form-control" type="text">
                 </div>
             </div>
-            <div class="" >
-                <div class=" offset-sm-2">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+            <div class="row col-12">
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
                 </div>
             </div>
         </form>
