@@ -16,8 +16,7 @@
             font-size: 13px;
         }
         .container{
-            margin-top: 10vh;
-            margin-left: 10px;
+            margin: 10vh 0px;
         }
         .btn{
             height: 30px;
@@ -89,6 +88,17 @@
             margin:0;
             padding-left: 10px;
         }
+        .row label div{
+            padding: 0px 15px;
+        }
+        .row{
+            margin-left: 0px;
+            margin-right: 0px;
+            margin-bottom: 20px; 
+        }
+        label{
+            padding-bottom: 5px;
+        }
     </style>
 
     <script>
@@ -138,34 +148,34 @@
             </a>
         </div>
     </div>
-    <div class="container">
-        <form class="">
+    <div class="container col-md-6">
+        <form>
             <div class="form-group row align-items-center">
-                <label class="col-form-label col-sm-2 col-lg-1"> Event Start </label>
-                <div class="col-sm-4">
+                <label class="col-6 col-sm-4"> Event Start </label>
+                <div class="col-12 col-sm-6">
                     <input class="form-control" type="text">
                 </div>
             </div>
             <div class="form-group row align-items-center">
-                <label class="col-form-label col-sm-2 col-lg-1"> Event End </label>
-                <div class="col-sm-4">
+                <label class="col-6 col-sm-4"> Event End </label>
+                <div class="col-12 col-sm-6">
                     <input class="form-control" type="text">
                 </div>
             </div>
             <div class="form-group row align-items-center">
-                <label class="col-form-label col-sm-2 col-lg-1"> Available Hour </label>
-                <div class="col-sm-4">
+                <label class="col-6 col-sm-4"> Available Hour </label>
+                <div class="col-12 col-sm-6">
                     <input class="form-control" type="text">
                 </div>
             </div>
             <div class="form-group row align-items-center">
-                <label class="col-form-label col-sm-2 col-lg-1"> Attendees </label>  
-                <div class="col-sm-4">
+                <label class="col-6 col-sm-4"> Attendees </label>  
+                <div class="col-12 col-sm-6">
                     <input class="form-control" type="text">
                 </div>
             </div>
             <div class="col-sm-6">
-                <div class="sk">
+                <div class="sk col">
                     <button type="submit" class="btn btn-primary btn-lg">Submit</button>
                 </div>
             </div>
