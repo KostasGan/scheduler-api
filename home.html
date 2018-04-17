@@ -16,26 +16,23 @@
             font-size: 13px;
         }
         .container{
-            margin: 10vh 0px;
+            margin: 5vh 0px;
         }
         .btn{
             height: 30px;
             width: 150px;
             padding: 0px;
-            margin-top: 20px;
+            margin: 5px auto;
         }
         label{
             margin: 0;
             padding: 0px;
             width: 100%;
         }
-        button{
-            margin: 0 auto;
-            
-        }
         input{
             font-size: 12px !important;
             height: 30px;
+            width: 80%;
         }
         form{
             margin-left:auto;
@@ -97,14 +94,19 @@
             margin-bottom: 20px; 
         }
         label{
-            padding-bottom: 5px;
+            padding: 0px 5px;
+
         }
     </style>
-
     <script>
         // var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
 
-        
+        // function getCurrentDate() {
+        //     var date = new Date();
+        //     var current = date.getFullYear() +"-0"+ ((date.getMonth()) + 1) + "-" + date.getDate();
+        //     console.log(date);
+        //     document.getElementById("event_start").setAttribute("min", date.toUTCString());
+        // }
         // function SignOutUser(){
         //     //alert('some');
         //     gapi.auth2.getAuthInstance().signOut();
@@ -151,27 +153,36 @@
     <div class="container col-md-6">
         <form>
             <div class="form-group row align-items-center">
-                <label class="col-6 col-sm-4"> Event Start </label>
                 <div class="col-12 col-sm-6">
-                    <input class="form-control" type="text">
+                    <label for="event_start"> Event Start </label>
+                    <input id="event_start"class="form-control" type="date">
                 </div>
             </div>
             <div class="form-group row align-items-center">
-                <label class="col-6 col-sm-4"> Event End </label>
                 <div class="col-12 col-sm-6">
-                    <input class="form-control" type="text">
+                    <label for="event_end"> Event End </label>
+                    <input id="event_end" class="form-control" type="date">
                 </div>
             </div>
             <div class="form-group row align-items-center">
-                <label class="col-6 col-sm-4"> Available Hour </label>
                 <div class="col-12 col-sm-6">
-                    <input class="form-control" type="text">
+                    <label for="duration"> Event Duration </label>
+                    <input id="duration" class="form-control" type="text">
+                    <small for="duration" class="text-muted">Must be in minutes</small>
                 </div>
             </div>
             <div class="form-group row align-items-center">
-                <label class="col-6 col-sm-4"> Attendees </label>  
                 <div class="col-12 col-sm-6">
-                    <input class="form-control" type="text">
+                    <label for="available_time"> Available Time </label>
+                    <input id="available_time" class="form-control" type="text">
+                    <small for="available_time" class="text-muted">eg."8:00-14:00, 0, 13:14-14:00". Zero for free days</small>
+                </div>
+            </div>
+            <div class="form-group row align-items-center">
+                <div class="col-12 col-sm-6">
+                    <label for="attendees"> Attendees </label> 
+                    <input id="attendees" class="form-control" type="text">
+                    <small for="attendees" class="text-muted">Emails should be comma separated eg. 'test@test.com, test@test.com'</small>
                 </div>
             </div>
             <div class="col-sm-6">
