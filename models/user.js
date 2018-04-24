@@ -39,14 +39,17 @@ UserSchema.statics.CreateUser = (email, access_token, friends_list) => {
 UserSchema.statics.findFriendsAccessToken = (friends_emails) => {
     let friends_email_list = friends_emails.split(',');
 
-    return new Promise.map(friends_email_list, (friend_mail) => {
+    return Promise.map(friends_email_list, (friend_mail) => {
         return user.findUser(friend_mail).then((friend) => {
             if(friend === null){
                 console.log('Create New User');
                 return user.CreateUser(friend_mail, " ", []);
             };
             
-            return friend;
+            return {
+                email: friend.email,
+                ac_token: friend.ac_token
+            };
         });
     });
 }
