@@ -30,7 +30,7 @@ exports.registerRoutes = function(app, config) {
             res.json({message: 'No access token. Please try again!'});
             return; 
         }
-        
+
         let oauth2Client = initGoogleAuth(credentials);
 
         userModel.findFriendsAccessToken(friends_list).then((friends) => {
@@ -49,7 +49,7 @@ exports.registerRoutes = function(app, config) {
                     unAuthUsers: Promise.map(unAuthUsers, (us) => {return us.email})
                 });
             });
-        }).then((obj) => {;
+        }).then((obj) => {
             if (obj.unAuthUsers.length >= 1){
                 console.log(obj.unAuthUsers);
                 res.status(401);
