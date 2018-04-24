@@ -23,14 +23,14 @@ exports.registerRoutes = function(app, config) {
         // let endDate = req.body.endDate || '';
         // let availableTime = req.body.availableTime || '';
         // let friends_list = req.body.friends_list || '';
-        let friends_list = 'kostas.efood@gmail.com'
+        let friends_list = 'kostas.efood1@gmail.com'
         access_token = req.body.access_token || '';
 
         if(access_token === ''){
             res.json({message: 'No access token. Please try again!'});
             return; 
         }
-
+        
         let oauth2Client = initGoogleAuth(credentials);
 
         userModel.findFriendsAccessToken(friends_list).then((friends) => {
@@ -43,13 +43,11 @@ exports.registerRoutes = function(app, config) {
                     }
                     return;
                 });
-            }).map((user) =>{
-                return user.email;
             }).then((unAuthUsers) =>{
-                return {
+                return Promise.props({
                     friend: friends,
-                    unAuthUsers: unAuthUsers
-                }
+                    unAuthUsers: Promise.map(unAuthUsers, (us) => {return us.email})
+                });
             });
         }).then((obj) => {;
             if (obj.unAuthUsers.length >= 1){
@@ -66,14 +64,16 @@ exports.registerRoutes = function(app, config) {
                 return;
             }
             else{
+                let some = [];
                 oauth2Client.credentials = {"access_token": access_token};
                 ev_controler.GetCalendarEvents(oauth2Client).then((val) =>{
-                    Promise.each(obj.friend, (us) => {
-                        oauth2Client.credentials = {"access_token": us.ac_token};
-                        ev_controler.GetCalendarEvents(oauth2Client).then((es) => { console.log(es); console.log(val);})
-                    });
+                    some.push(val);
                 }).catch((e) => {
                     console.log(e);
+                });
+                Promise.each(obj.friend, (us) => {
+                    oauth2Client.credentials = {"access_token": us.ac_token};
+                    ev_controler.GetCalendarEvents(oauth2Client).then((es) => { some.push(es);})
                 });
             }
         });

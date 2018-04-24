@@ -26,10 +26,7 @@ exports.GetCalendarEvents = (oauth2Client) => {
             let events = response.items || [];
 
             if (events.length == 0) {
-                return resolve({
-                    "status": "success",
-                    "events": []
-                });
+                return resolve([]);
             } else {
                 return new Promise.map(events, (event) => {
                     return {
@@ -41,10 +38,7 @@ exports.GetCalendarEvents = (oauth2Client) => {
                         endHour: new Date(event.end.dateTime).getHours()
                     };
                 }).then((new_events) => {
-                    return resolve({
-                        "status": "success",
-                        "events": new_events
-                    });
+                    return resolve(new_events);
                 });
             }
         });
