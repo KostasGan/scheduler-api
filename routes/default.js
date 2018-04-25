@@ -4,6 +4,8 @@ const Promise = require('bluebird');
 const auth = require('../helpers/oauth');
 const ev_controler = require('../controllers/event-scheduler');
 const userModel = require('../models/user').Model;
+const moment = require('moment');
+
 
 function initGoogleAuth(credentials){
     let auth = new googleAuth();
@@ -19,11 +21,11 @@ exports.registerRoutes = function(app, config) {
     let credentials = config.get('web');
     
     app.post('/', (req, res) => {
-        // let startDate = req.body.startDate || '';
-        // let endDate = req.body.endDate || '';
+        let startDate = req.body.startDate || '2018-03-01 10:00';
+        let endDate = req.body.endDate || '2018-03-01 11:00';
         // let availableTime = req.body.availableTime || '';
         // let friends_list = req.body.friends_list || '';
-        let friends_list = 'kostas.efood@gmail.com'
+        let friends_list = 'kostasgan@e-food.gr'
         access_token = req.body.access_token || '';
 
         if(access_token === ''){
@@ -77,13 +79,38 @@ exports.registerRoutes = function(app, config) {
                 Promise.all(list).each((items) => {
                     oauth2Client.credentials = {"access_token": items};
     
-                    return ev_controler.GetCalendarEvents(oauth2Client).then((event) => {
-                        if(event.length === 0){
+                    return ev_controler.GetCalendarEvents(oauth2Client, startDate, endDate).then((events) => {
+                        if(events.length === 0){
                             availability++;
                         }
-                        console.log(event);
+                        else{
+                            let currentStart = moment(startDate);
+                            let currentEnd = moment(endDate);
+
+                            Promise.each(events, (event) => {
+                                if((currentStart.hour()+1 < event.startHour || currentStart.hour()+1 > event.startHour) && (currentStart.hour()+1 < event.endHour || currentStart.hour()-1 > event.endHour) ){
+                                    if((currentEnd.hour()+1 < event.startHour || currentEnd.hour()-1 < event.startHour) && (currentEnd.hour()+1 < event.endHour || currentEnd.hour()-1 < event.endHour) ){
+                                        console.log('oysao');
+                                        availability++;
+                                    }
+                                }
+                            });
+                        }
+                        console.log(events);
                     });
-                }).then(() => { console.log(availability);});
+                }).then(() => { 
+                    if(availability === list.length){
+                        res.json({
+                            message: 'Available Date'
+                        });
+                    }
+                    else{
+                        res.json({
+                            message: 'Unavailable Date'
+                        });
+                    }
+                    console.log(availability);
+                });
             });
         }).catch((e) => {
             console.log(e);
