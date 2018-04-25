@@ -4,14 +4,14 @@ const moment = require('moment');
 
 let calendar = google.calendar('v3');
 
-exports.GetCalendarEvents = (oauth2Client) => {
+exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
     return new Promise((resolve, reject) =>{
         calendar.events.list({
             auth: oauth2Client,
             calendarId: 'primary',
-            timeMin: (new Date(2018,02,01,10)).toISOString(),
-            timeMax: (new Date(2018,02,28,18)).toISOString(),
-            maxResults: 1,
+            timeMin: moment(startDate).toISOString(),
+            timeMax: moment(endDate).toISOString(),
+            maxResults: 10,
             singleEvents: true,
             orderBy: 'startTime'
         }, function (err, response) {
@@ -29,13 +29,15 @@ exports.GetCalendarEvents = (oauth2Client) => {
                 return resolve([]);
             } else {
                 return new Promise.map(events, (event) => {
+                    let startDate = moment(event.start.dateTime);
+                    let endDate = moment(event.end.dateTime);
                     return {
                         event_id: event.id,
                         summary: event.summary,
-                        startDate: new Date(event.start.dateTime),
-                        startHour: new Date(event.start.dateTime).getHours(),
-                        endDate: new Date(event.end.dateTime),
-                        endHour: new Date(event.end.dateTime).getHours()
+                        startDate: startDate.format('YYYY-MM-DD HH:mm'),
+                        startHour: startDate.hour(),
+                        endDate: endDate.format('YYYY-MM-DD HH:mm'),
+                        endHour: endDate.hour()
                     };
                 }).then((new_events) => {
                     return resolve(new_events);
