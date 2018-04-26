@@ -84,12 +84,17 @@ exports.registerRoutes = function(app, config) {
                             availability++;
                         }
                         else{
-                            let currentStart = moment(startDate);
-                            let currentEnd = moment(endDate);
+                            let currentStartHour = moment(startDate).hours();
+                            let currentEndHour = moment(endDate).hours();
 
                             Promise.each(events, (event) => {
-                                if((currentStart.hour()+1 < event.startHour || currentStart.hour()+1 > event.startHour) && (currentStart.hour()+1 < event.endHour || currentStart.hour()-1 > event.endHour) ){
-                                    if((currentEnd.hour()+1 < event.startHour || currentEnd.hour()-1 < event.startHour) && (currentEnd.hour()+1 < event.endHour || currentEnd.hour()-1 < event.endHour) ){
+                                let checkStartHours = (currentStartHour+1 < event.startHour || currentStartHour+1 > event.startHour);
+                                let checkStartEndHours = (currentStartHour+1 < event.endHour || currentStartHour-1 > event.endHour);
+                                let checkEndStartHours =  (currentEndHour+1 < event.startHour || currentEndHour-1 < event.startHour);
+                                let checkEndEndHours =  (currentEndHour+1 < event.endHour || currentEndHour-1 < event.endHour);
+                                
+                                if(checkStartHours && checkStartEndHours){
+                                    if(checkEndStartHours && checkEndEndHours){
                                         console.log('oysao');
                                         availability++;
                                     }
