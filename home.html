@@ -16,7 +16,7 @@
             font-size: 13px;
         }
         .container{
-            margin: 5vh 0px;
+            margin: 5vh auto;
         }
         .btn{
             height: 30px;
@@ -31,7 +31,7 @@
         }
         input{
             font-size: 12px !important;
-            height: 30px;
+            height: 40px;
             width: 80%;
         }
         form{
@@ -114,7 +114,16 @@
         //     //alert('some');
         //     gapi.auth2.getAuthInstance().signOut();
         // }
-    
+        function submitForm() {
+            let event_start = document.getElementById('event_start').value;
+            let event_end = document.getElementById('event_end').value;
+            let event_duration = document.getElementById('duration').value;
+            let available_time = document.getElementById('available_time').value;
+            let attendees = document.getElementById('attendees').value;
+
+            console.log(event_duration);
+        }
+            
 
         // function handleClientLoad() {
         //     gapi.load('auth2', () => {
@@ -154,7 +163,7 @@
         </div>
     </div>
     <div class="container">
-        <form class="col-sm-10">
+        <form method="POST" class="col-sm-10" onsubmit="submitForm()">
             <div class="form-group">
                 <div class="col-12 col-sm-6">
                     <label for="event_start"> Event Start </label>
@@ -178,14 +187,14 @@
                 <div class="col-12 col-sm-6">
                     <label for="available_time"> Available Time </label>
                     <input id="available_time" class="form-control" type="text">
-                    <small for="available_time" class="text-muted">eg."8:00-14:00, 0, 13:14-14:00". Zero for free days</small>
+                    <small for="available_time" class="text-muted">eg."8:00-14:00, 0, ...". Zero for free days</small>
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-12 col-sm-6">
                     <label for="attendees"> Attendees </label> 
                     <input id="attendees" class="form-control" type="text">
-                    <small for="attendees" class="text-muted">Emails should be comma separated eg. 'test@test.com, test@test.com'</small>
+                    <small for="attendees" class="text-muted">eg. 'test@test.com, test@test.com'</small>
                 </div>
             </div>
             <div class="form-group">
