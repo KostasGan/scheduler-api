@@ -65,7 +65,7 @@
 
       let xhr = new XMLHttpRequest();
       xhr.open('POST',
-        'http://localhost:8080/gauthredirect');
+        'http://localhost:8080/gauthredirect', true);
       xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       xhr.onreadystatechange = function (e) {
         if (e.status === 'Failed') {
@@ -74,9 +74,7 @@
           pre.appendChild(textContent);
         }
         else {
-          var pre = document.getElementById('content');
-          var textContent = document.createTextNode(access_token + '\n');
-          pre.appendChild(textContent);
+          window.location.pathname = '/home.html';
         }
       };
       xhr.send('access_token=' + access_token);
@@ -119,7 +117,7 @@
     };
 
     window.onbeforeunload = (e) => {
-      gapi.auth2.getAuthInstance().signOut();
+      //gapi.auth2.getAuthInstance().signOut();
     };
   </script>
   
