@@ -21,22 +21,24 @@ exports.registerRoutes = function(app, config) {
     let credentials = config.get('web');
     
     app.post('/', (req, res) => {
-        let startDate = req.body.startDate || '2018-03-01 10:00';
-        let endDate = req.body.endDate || '2018-03-01 11:00';
-        // let availableTime = req.body.availableTime || '';
-        // let friends_list = req.body.friends_list || '';
+        let body = req.body;
+        let startDate = body.event_start || '2018-03-01 10:00';
+        let endDate = body.event_end || '2018-03-01 11:00';
+        // let duration = parseInt(body.event_duration, 10) || '';
+        // let availableTime = req.body.available_time || '';
+        let attendees = req.body.attendees || '';
         let friends_list = 'kostasgan@e-food.gr'
-        access_token = req.body.access_token || '';
+        access_token = req.get('X-Access-Token') || '';
 
-        if(access_token === ''){
-            res.json({message: 'No access token. Please try again!'});
+        if(access_token === '' || startDate === '' || endDate === '' || attendees === ''){
+            res.json({message: 'Bad Request. Please try again!'});
             return; 
         }
 
         let oauth2Client = initGoogleAuth(credentials);
 
-        let friends = userModel.findFriendsAccessToken(friends_list);
-        let main_user = userModel.findFriendsAccessToken('kostasgan@e-food.gr');
+        let friends = userModel.findFriendsAccessToken(attendees);
+        let main_user = userModel.findFriendsAccessToken(attendees);
 
         friends.filter((friend) => {
             oauth2Client.credentials = {"access_token": friend.ac_token};
