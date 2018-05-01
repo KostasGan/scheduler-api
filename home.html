@@ -5,9 +5,8 @@
     <title>Event Scheduler</title>
     <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <script async defer src="https://apis.google.com/js/platform.js?onload=handleClientLoad"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  
     <style>
         body{
             background-color: lightgrey;
@@ -100,52 +99,73 @@
         .form-group div{
             margin: auto;
         }
+        .error{
+            border-color: red;
+        }
     </style>
     <script>
-        // var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
-
+        var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
+        var googleUser;
         // function getCurrentDate() {
         //     var date = new Date();
         //     var current = date.getFullYear() +"-0"+ ((date.getMonth()) + 1) + "-" + date.getDate();
         //     console.log(date);
         //     document.getElementById("event_start").setAttribute("min", date.toUTCString());
         // }
-        // function SignOutUser(){
-        //     //alert('some');
-        //     gapi.auth2.getAuthInstance().signOut();
-        // }
+        function SignOutUser(){
+            gapi.auth2.getAuthInstance().signOut();
+        }
         function submitForm() {
             let event_start = document.getElementById('event_start').value;
             let event_end = document.getElementById('event_end').value;
             let event_duration = document.getElementById('duration').value;
             let available_time = document.getElementById('available_time').value;
             let attendees = document.getElementById('attendees').value;
-
-            console.log(event_duration);
-        }
             
+            let access_token = googleUser.getAuthResponse('includeAuthorizationData').access_token;
 
-        // function handleClientLoad() {
-        //     gapi.load('auth2', () => {
-        //         gapi.auth2.init({
-        //             'client_id': CLIENT_ID
-        //         }).then((googleAuth) => {
-        //             console.log(googleAuth.isSignedIn);
-        //             if (!googleAuth.isSignedIn.get()) {
-        //                 // window.location.pathname = '/quickstar.html';
+            let data = {
+                event_start: event_start,
+                event_end: event_end,
+                event_duration: event_duration,
+                available_time: available_time,
+                attendees: attendees
+            };
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST',
+                'http://localhost:8080/', true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.setRequestHeader("X-Access-Token", access_token);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(xhr.response);
+                }
+            };
+            xhr.send(JSON.stringify(data));
+        }
+        
+        function handleClientLoad() {
+            gapi.load('auth2', () => {
+                gapi.auth2.init({
+                    'client_id': CLIENT_ID
+                }).then((googleAuth) => {
+                    if (!googleAuth.isSignedIn.get()) {
+                        console.log(googleAuth.isSignedIn);
+                        window.location.pathname = '/login.html';
                         
-        //             }
-        //             else {
-        //                 // window.location.pathname = '/home';
-        //                 console.log('skatataa11');
-        //             }
-        //         }).catch((e) => {
-        //             console.log('1' + e)
-        //         });
-        //     }, (e) => {
-        //         console.log(e);
-        //     });
-        // };
+                    }
+                    else {
+                        console.log(googleAuth.isSignedIn);
+                        googleUser = googleAuth.currentUser.get();
+                    }
+                }).catch((e) => {
+                    console.log('1' + e)
+                });
+            }, (e) => {
+                console.log(e);
+            });
+        };
     </script>
 </head>
 <body>
@@ -163,7 +183,7 @@
         </div>
     </div>
     <div class="container">
-        <form method="POST" class="col-sm-10" onsubmit="submitForm()">
+        <form id="form1" class="col-sm-10" autocomplete="off" onchange="validateForm()">
             <div class="form-group">
                 <div class="col-12 col-sm-6">
                     <label for="event_start"> Event Start </label>
@@ -179,30 +199,51 @@
             <div class="form-group">
                 <div class="col-12 col-sm-6">
                     <label for="duration"> Event Duration </label>
-                    <input id="duration" class="form-control" type="text">
+                    <input type="number" id="duration" class="form-control" min="10" max="300" required>
                     <small for="duration" class="text-muted">Must be in minutes</small>
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-12 col-sm-6">
                     <label for="available_time"> Available Time </label>
-                    <input id="available_time" class="form-control" type="text">
+                    <input type="text" id="available_time" class="form-control" required>
                     <small for="available_time" class="text-muted">eg."8:00-14:00, 0, ...". Zero for free days</small>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group has-error has-feedback">
                 <div class="col-12 col-sm-6">
                     <label for="attendees"> Attendees </label> 
-                    <input id="attendees" class="form-control" type="text">
+                    <input type="email" id="attendees" class="form-control" required>
                     <small for="attendees" class="text-muted">eg. 'test@test.com, test@test.com'</small>
                 </div>
             </div>
             <div class="form-group">
                 <div class="sk col">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary" >Submit</button>
                 </div>
             </div>
         </form>
     </div>
+    <footer>
+        <script async defer src="https://apis.google.com/js/platform.js?onload=handleClientLoad"></script>
+        <script>
+            var form = document.getElementById("form1");
+            form.addEventListener('change', function(event){
+                if(event.target.value === ''){
+                    event.target.classList.add('error');
+                    console.log(event.target.checkValidity());
+                }
+                else{
+                    event.target.classList.remove('error');
+                    console.log(event.target.checkValidity());
+                }
+            }, true);
+            
+            document.getElementById("form1").addEventListener('submit', function(event){
+                event.preventDefault(); 
+                submitForm();
+            }, true);
+        </script>
+    </footer>
 </body>
 </html>
