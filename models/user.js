@@ -44,12 +44,13 @@ UserSchema.statics.findFriendsAccessToken = (friends_emails) => {
             if(friend === null){
                 console.log('Create New User');
                 return user.CreateUser(friend_mail, " ", []);
-            };
-            
-            return {
-                email: friend.email,
-                ac_token: friend.ac_token
-            };
+            }
+            else{
+                return {
+                    email: friend.email,
+                    ac_token: friend.ac_token
+                };
+            }         
         });
     });
 }
@@ -58,20 +59,3 @@ UserSchema.statics.findFriendsAccessToken = (friends_emails) => {
 user = db.mongoose.model('calendar_users', UserSchema);
 
 exports.Model = user;
-
-
-
-// exports.User = class User {
-//     constructor(email, ac_token, friends_list){
-//         this.email = email;
-//         this.ac_token = ac_token;
-//         this.friends_list = friends_list || [];
-//     }
-
-//     getEmail() { return this.email; }
-//     getToken() { return this.token; }
-//     getFriendsList() { return this.friends_list; }
-
-
-//     setFriendList(list) { this.friends_list = list; }
-// }
