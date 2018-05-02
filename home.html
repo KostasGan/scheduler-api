@@ -115,6 +115,18 @@
         function SignOutUser(){
             gapi.auth2.getAuthInstance().signOut();
         }
+        function checkValidEmails(attendees){
+            var re = /^(([^<>()\[\]\\.:@"]+(\.[^<>()\[\]\\.:@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            let emails = attendees.trim().split(",");
+            let wrong_emails = 0;
+            emails.forEach((email) => {
+                if(!re.test(String(email.trim()).toLowerCase())){
+                    wrong_emails++;
+                }
+                return;
+            });
+            return wrong_emails;
+        }
         function submitForm() {
             let event_start = document.getElementById('event_start').value;
             let event_end = document.getElementById('event_end').value;
@@ -123,6 +135,19 @@
             let attendees = document.getElementById('attendees').value;
             
             let access_token = googleUser.getAuthResponse('includeAuthorizationData').access_token;
+            
+            let wrong_emails = checkValidEmails(attendees);
+
+            if (wrong_emails !== 0){
+                document.getElementById('attendees').classList.add('error');
+                document.getElementById('msg').innerHTML = "Wrong Email";
+                document.getElementById('msg').style.color = "red";
+                return;
+            }
+            else{
+                document.getElementById('attendees').classList.remove('error');
+                document.getElementById('msg').innerHTML = "";
+            }
 
             let data = {
                 event_start: event_start,
@@ -150,17 +175,18 @@
                 gapi.auth2.init({
                     'client_id': CLIENT_ID
                 }).then((googleAuth) => {
-                    if (!googleAuth.isSignedIn.get()) {
-                        console.log(googleAuth.isSignedIn);
-                        window.location.pathname = '/login.html';
-                        
-                    }
-                    else {
-                        console.log(googleAuth.isSignedIn);
+                    let cookie = document.cookie;
+                    let validCookie = cookie.indexOf("G_AUTH=true") != -1;
+
+                    if (cookie && cookie.indexOf("G_AUTH=true") != -1 && googleAuth.isSignedIn.get()) {
                         googleUser = googleAuth.currentUser.get();
                     }
+                    else {
+                        gapi.auth2.getAuthInstance().signOut();
+                        window.location.pathname = '/login.html';
+                    }
                 }).catch((e) => {
-                    console.log('1' + e)
+                    console.log('Home Page says: ' + e)
                 });
             }, (e) => {
                 console.log(e);
@@ -183,7 +209,7 @@
         </div>
     </div>
     <div class="container">
-        <form id="form1" class="col-sm-10" autocomplete="off" onchange="validateForm()">
+        <form id="form1" class="col-sm-10" autocomplete="off">
             <div class="form-group">
                 <div class="col-12 col-sm-6">
                     <label for="event_start"> Event Start </label>
@@ -210,11 +236,12 @@
                     <small for="available_time" class="text-muted">eg."8:00-14:00, 0, ...". Zero for free days</small>
                 </div>
             </div>
-            <div class="form-group has-error has-feedback">
+            <div class="form-group">
                 <div class="col-12 col-sm-6">
                     <label for="attendees"> Attendees </label> 
-                    <input type="email" id="attendees" class="form-control" required>
+                    <input type="text" id="attendees" class="form-control" required>
                     <small for="attendees" class="text-muted">eg. 'test@test.com, test@test.com'</small>
+                    <div><span id="msg"></span></div>
                 </div>
             </div>
             <div class="form-group">
@@ -227,17 +254,24 @@
     <footer>
         <script async defer src="https://apis.google.com/js/platform.js?onload=handleClientLoad"></script>
         <script>
-            var form = document.getElementById("form1");
-            form.addEventListener('change', function(event){
-                if(event.target.value === ''){
-                    event.target.classList.add('error');
-                    console.log(event.target.checkValidity());
-                }
-                else{
-                    event.target.classList.remove('error');
-                    console.log(event.target.checkValidity());
-                }
-            }, true);
+            // let attendees = document.getElementById("attendees");
+            // attendees.addEventListener('change', function(event){
+            //     var re = /^(([^<>()\[\]\\.:@"]+(\.[^<>()\[\]\\.:@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            //     let emails = event.target.value.trim().split(",");
+            //     let wrong_emails = 0;
+            //     emails.forEach((email) => {
+            //         if(!re.test(String(email.trim()).toLowerCase())){
+            //             wrong_emails++;
+            //         }
+            //         return;
+            //     });
+            //     if (wrong_emails !== 0){
+                    
+            //     }
+            //     else{
+            //         document.getElementById('msg').innerHTML = "";
+            //     }
+            // }, true);
             
             document.getElementById("form1").addEventListener('submit', function(event){
                 event.preventDefault(); 
