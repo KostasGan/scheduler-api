@@ -74,6 +74,13 @@
           pre.appendChild(textContent);
         }
         else {
+          let date = new Date();
+          date.setTime(date.getTime() + 3600000);
+
+          let exp = "expires="+date.toUTCString();
+
+          document.cookie = "G_AUTH=true;" + exp + ";path=/"
+
           window.location.pathname = '/home.html';
         }
       };
@@ -109,7 +116,7 @@
             console.log('skatataa');
           }
         }).catch((e) => {
-          console.log('1' + e)
+          console.log('Login Page says: ' + e)
         });
       }, (e) => {
         console.log(e);
