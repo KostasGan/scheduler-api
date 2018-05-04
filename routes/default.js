@@ -58,91 +58,91 @@ exports.registerRoutes = function(app, config) {
 
         let oauth2Client = initGoogleAuth(credentials);
 
-        // let friends = userModel.findFriendsAccessToken(attendees);
-        // let main_user = userModel.findFriendsAccessToken(attendees);
+        let friends = userModel.findFriendsAccessToken(attendees);
+        let main_user = userModel.findFriendsAccessToken(attendees);
 
-        // friends.filter((friend) => {
-        //     oauth2Client.credentials = {"access_token": friend.ac_token};
+        friends.filter((friend) => {
+            oauth2Client.credentials = {"access_token": friend.ac_token};
 
-        //     return auth.checkAuthToken(oauth2Client).then((val) =>{
-        //         if(val.message === "Invalid Credentials"){
-        //             return friend.email;
-        //         }
-        //         return;
-        //     });
-        // }).map((friend) => {
-        //     return friend.email;
-        // }).then((unAuthUsers) => {
-        //     if(unAuthUsers.length > 0){
-        //         res.status(401);
-        //         res.json({
-        //             status: "error",
-        //             error_code: "unauthorized_friends",
-        //             message: "Some of friendList's users need Authorization",
-        //             data : {
-        //                 users: unAuthUsers
-        //             }
-        //         });
-        //         return;
-        //     }
+            return auth.checkAuthToken(oauth2Client).then((val) =>{
+                if(val.message === "Invalid Credentials"){
+                    return friend.email;
+                }
+                return;
+            });
+        }).map((friend) => {
+            return friend.email;
+        }).then((unAuthUsers) => {
+            if(unAuthUsers.length > 0){
+                res.status(401);
+                res.json({
+                    status: "error",
+                    error_code: "unauthorized_friends",
+                    message: "Some of friendList's users need Authorization",
+                    data : {
+                        users: unAuthUsers
+                    }
+                });
+                return;
+            }
 
-        //     Promise.props({
-        //         main_user: main_user,        
-        //         friends: friends
-        //     }).then((props) => {
-        //         let list = [];
-        //         let availability = 0;
-        //         props.main_user.forEach((user) => {
-        //             list.push(user.ac_token);
-        //         });
-        //         props.friends.forEach((friend) => {
-        //             list.push(friend.ac_token);
-        //         });
+            Promise.props({
+                main_user: main_user,        
+                friends: friends
+            }).then((props) => {
+                let list = [];
+                let availability = 0;
+                props.main_user.forEach((user) => {
+                    list.push(user.ac_token);
+                });
+                props.friends.forEach((friend) => {
+                    list.push(friend.ac_token);
+                });
     
-        //         Promise.all(list).each((items) => {
-        //             oauth2Client.credentials = {"access_token": items};
+                Promise.all(list).each((items) => {
+                    oauth2Client.credentials = {"access_token": items};
     
-        //             return ev_controler.GetCalendarEvents(oauth2Client, startDate, endDate).then((events) => {
-        //                 if(events.length === 0){
-        //                     availability++;
-        //                 }
-        //                 else{
-        //                     let currentStartHour = moment(startDate).hours();
-        //                     let currentEndHour = moment(endDate).hours();
+                    return ev_controler.GetCalendarEvents(oauth2Client, startDate, endDate).then((events) => {
+                        if(events.length === 0){
+                            availability++;
+                        }
+                        else{
+                            let currentStartHour = moment(startDate).hours();
+                            let currentEndHour = moment(endDate).hours();
 
-        //                     Promise.each(events, (event) => {
-        //                         let checkStartHours = (currentStartHour+1 < event.startHour || currentStartHour+1 > event.startHour);
-        //                         let checkStartEndHours = (currentStartHour+1 < event.endHour || currentStartHour-1 > event.endHour);
-        //                         let checkEndStartHours =  (currentEndHour+1 < event.startHour || currentEndHour-1 < event.startHour);
-        //                         let checkEndEndHours =  (currentEndHour+1 < event.endHour || currentEndHour-1 < event.endHour);
+                            Promise.each(events, (event) => {
+                                let checkStartHours = (currentStartHour+1 < event.startHour || currentStartHour+1 > event.startHour);
+                                let checkStartEndHours = (currentStartHour+1 < event.endHour || currentStartHour-1 > event.endHour);
+                                let checkEndStartHours =  (currentEndHour+1 < event.startHour || currentEndHour-1 < event.startHour);
+                                let checkEndEndHours =  (currentEndHour+1 < event.endHour || currentEndHour-1 < event.endHour);
                                 
-        //                         if(checkStartHours && checkStartEndHours){
-        //                             if(checkEndStartHours && checkEndEndHours){
-        //                                 console.log('oysao');
-        //                                 availability++;
-        //                             }
-        //                         }
-        //                     });
-        //                 }
-        //                 console.log(events);
-        //             });
-        //         }).then(() => { 
-        //             if(availability === list.length){
-        //                 res.json({
-        //                     message: 'Available Date'
-        //                 });
-        //             }
-        //             else{
-        //                 res.json({
-        //                     message: 'Unavailable Date'
-        //                 });
-        //             }
-        //             console.log(availability);
-        //         });
-        //     });
-        // }).catch((e) => {
-        //     console.log(e);
-        // });
+                                if(checkStartHours && checkStartEndHours){
+                                    if(checkEndStartHours && checkEndEndHours){
+                                        console.log('oysao');
+                                        availability++;
+                                    }
+                                }
+                            });
+                        }
+                        console.log(events);
+                    });
+                }).then(() => { 
+                    if(availability === list.length){
+                        res.json({
+                            message: 'Available Date'
+                        });
+                    }
+                    else{
+                        res.json({
+                            message: 'Unavailable Date'
+                        });
+                    }
+                    console.log(availability);
+                });
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
     });
 
     app.post('/gauthredirect', (req, res) => {
