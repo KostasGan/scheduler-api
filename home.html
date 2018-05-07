@@ -6,7 +6,11 @@
     <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <style>
         body{
             background-color: lightgrey;
@@ -36,6 +40,7 @@
         form{
             margin-left:auto;
             margin-right:auto;
+            margin-top: 25vh;
         }
         @media screen and (max-width:768px) {
             .logo{
@@ -52,6 +57,9 @@
             }
             input{
                 height:40px !important;
+            }
+            form{
+                margin-top: calc(25vh - 50px);
             }
         }
         .sk{
@@ -109,12 +117,8 @@
     <script>
         var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
         var googleUser;
-        function getCurrentDate() {
-            var date = new Date();
-            var current = date.getFullYear() +"-0"+ ((date.getMonth()) + 1) + "-" + date.getDate();
-            console.log(date);
-            document.getElementById("event_start").setAttribute("min", date.toUTCString());
-        }
+
+
         function SignOutUser(){
             gapi.auth2.getAuthInstance().signOut();
         }
@@ -155,13 +159,10 @@
 
             if (wrong_hours !== 0){
                 document.getElementById('available_time').classList.add('error');
-                document.getElementById('msg').innerHTML = "Wrong Email";
-                document.getElementById('msg').style.color = "red";
                 return;
             }
             else{
                 document.getElementById('available_time').classList.remove('error');
-                document.getElementById('msg').innerHTML = "";
             }
         }
 
@@ -218,7 +219,7 @@
             <h6>Event-Scheduler</h6>
         </div>
         <div class="logout" onclick="SignOutUser()" >
-            <a href="/quickstar.html" style="color:black">
+            <a href="/login.html" style="color:black">
                 <i class="fa fa-sign-out" ></i>
             </a>
         </div>
@@ -227,14 +228,8 @@
         <form id="form1" class="col-sm-10" autocomplete="off">
             <div class="form-group">
                 <div class="col-12 col-sm-6">
-                    <label for="event_start"> Event Start </label>
-                    <input id="event_start"class="form-control" type="date">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-12 col-sm-6">
-                    <label for="event_end"> Event End </label>
-                    <input id="event_end" class="form-control" type="date">
+                    <label for="event_date"> Event Date </label>
+                    <input id="event_date"class="form-control" required>
                 </div>
             </div>
             <div class="form-group">
@@ -269,6 +264,21 @@
     <footer>
         <script async defer src="https://apis.google.com/js/platform.js?onload=handleClientLoad"></script>
         <script>
+            let event_start;
+            let event_end;
+
+            $('#event_date').daterangepicker({
+                "locale":{
+                    "format": "DD-MM-YYYY",
+                    "separator": " - ",
+                },
+                "opens": "left",
+                "minDate": new moment()
+            }, function(start, end, label) {
+                event_start = start.format('YYYY-MM-DD');
+                event_end = end.format('YYYY-MM-DD');
+            });
+
             document.getElementById("form1").addEventListener('submit', function(event){
                 event.preventDefault();
                 
@@ -283,10 +293,16 @@
                     return;
                 }
                 else{
-                    let event_start = document.getElementById('event_start').value;
-                    let event_end = document.getElementById('event_end').value;
                     let event_duration = document.getElementById('duration').value;
                     
+                   if(!event_start && !event_end){
+                       let value = document.getElementById('event_date').value;
+                       let spltVal = value.split(" - ");
+
+                       event_start = moment(spltVal[0]).format('YYYY-MM-DD').toString();
+                       event_end = moment(spltVal[1]).format('YYYY-MM-DD').toString();
+                   }
+
                     let data = {
                         event_start: event_start,
                         event_end: event_end,
