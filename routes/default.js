@@ -30,23 +30,73 @@ function checkValidEmails(attendees){
     });
 }
 
+function checkAvailableTime(available_time){
+    var re = /^(?:(([01]?\d|2[0-3]):([0-5]?\d))-(([01]?\d|2[0-3]):([0-5]?\d)))$/;
+    let wrong_times = 0;
+    return Promise.each(available_time,(time) => {
+        if(!re.test(String(time.trim()))){
+            wrong_times++;
+        }
+        return;
+    }).then(() => {
+        return Promise.resolve(wrong_times);
+    });
+}
+
+function formatDateWithTime(startDate, endDate, diffDate, available_time){
+    let range = [];
+    for(let i=0; i <= diffDate; i++){
+        let av_time = available_time[i].trim().split(/[":\-"]/);
+
+        if(av_time[i] !== "0" && av_time[i+1] !== "0"){
+            range.push({
+                "startDate": startDate.add(i, "d").set({'hour': av_time[0], 'minutes': av_time[1]}).toISOString(),
+                "endDate": startDate.add(i, "d").set({'hour': av_time[2], 'minutes': av_time[3]}).toISOString()
+            });
+        }
+    }
+    return Promise.all(range);
+}
+
 exports.registerRoutes = function(app, config) {
     let access_token;
     let credentials = config.get("web");
     
     app.post("/", (req, res) => {
         let body = req.body;
-        let startDate = body.event_start || "2018-03-01 10:00";
-        let endDate = body.event_end || "2018-03-01 11:00";
+        let startDate = moment(body.event_start) || moment().toISOString();
+        let endDate = moment(body.event_end) || moment().add(1, "h").toISOString();
         let duration = parseInt(body.event_duration, 10) || 1;
-        let available_time = body.available_time || "";
+        let available_time = body.available_time.split(",") || "";
         let attendees = body.attendees || ""  ;
         let friends_list = "kostasgan@e-food.gr"
         access_token = req.get('X-Access-Token') || "";
+        
+        let diffDate = endDate.diff(startDate,"day");
+        let dateRange = [];
 
         if(access_token === "" || startDate === "" || endDate === "" || attendees === ""){
             res.json({message: "Bad Request. Please try again!"});
             return; 
+        }
+        
+        if(available_time.length >= diffDate){
+            checkAvailableTime(available_time).then((val) => {
+                if (val > 0){
+                    res.json({message: "Invalid Available Time. Try again!"});
+                    return;
+                }
+                else{
+                    dateRange = formatDateWithTime(startDate, endDate, diffDate, available_time);
+                    Promise.all(dateRange).then((v) => {
+                        console.log(v);
+                    })
+                }
+            });
+        }
+        else{
+            res.json({message: "Invalid Available Time. Try again!"});
+            return;
         }
 
         checkValidEmails(attendees).then((val) => {
@@ -56,11 +106,15 @@ exports.registerRoutes = function(app, config) {
             }
         });
 
-        let oauth2Client = initGoogleAuth(credentials);
 
+        
+
+        let oauth2Client = initGoogleAuth(credentials);
         let friends = userModel.findFriendsAccessToken(attendees);
         let main_user = userModel.findFriendsAccessToken(attendees);
 
+
+        
         friends.filter((friend) => {
             oauth2Client.credentials = {"access_token": friend.ac_token};
 
