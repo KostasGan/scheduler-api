@@ -9,8 +9,8 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
         calendar.events.list({
             auth: oauth2Client,
             calendarId: 'primary',
-            timeMin: moment(startDate).toISOString(),
-            timeMax: moment(endDate).toISOString(),
+            timeMin: startDate,
+            timeMax: endDate,
             maxResults: 10,
             singleEvents: true,
             orderBy: 'startTime'
