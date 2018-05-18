@@ -47,11 +47,11 @@ function formatDateWithTime(startDate, endDate, diffDate, available_time){
     let range = [];
     for(let i=0; i <= diffDate; i++){
         let av_time = available_time[i].trim().split(/[":\-"]/);
-
+        
         if(av_time[i] !== "0" && av_time[i+1] !== "0"){
             range.push({
                 "startDate": startDate.add(i, "d").set({'hour': av_time[0], 'minutes': av_time[1]}).toISOString(),
-                "endDate": startDate.add(i, "d").set({'hour': av_time[2], 'minutes': av_time[3]}).toISOString()
+                "endDate": startDate.set({'hour': av_time[2], 'minutes': av_time[3]}).toISOString()
             });
         }
     }
@@ -80,17 +80,16 @@ exports.registerRoutes = function(app, config) {
             return; 
         }
         
-        if(available_time.length >= diffDate){
-            checkAvailableTime(available_time).then((val) => {
+        if(available_time.length > diffDate){
+            checkAvailableTime(available_time).then((val) => { 
                 if (val > 0){
                     res.json({message: "Invalid Available Time. Try again!"});
                     return;
                 }
                 else{
-                    dateRange = formatDateWithTime(startDate, endDate, diffDate, available_time);
-                    Promise.all(dateRange).then((v) => {
-                        console.log(v);
-                    })
+                    formatDateWithTime(startDate, endDate, diffDate, available_time).then((v) => {
+                        dateRange = v;
+                    });
                 }
             });
         }
@@ -106,15 +105,10 @@ exports.registerRoutes = function(app, config) {
             }
         });
 
-
-        
-
         let oauth2Client = initGoogleAuth(credentials);
         let friends = userModel.findFriendsAccessToken(attendees);
-        let main_user = userModel.findFriendsAccessToken(attendees);
+        let main_user = userModel.findFriendsAccessToken(friends_list);
 
-
-        
         friends.filter((friend) => {
             oauth2Client.credentials = {"access_token": friend.ac_token};
 
@@ -145,53 +139,67 @@ exports.registerRoutes = function(app, config) {
                 friends: friends
             }).then((props) => {
                 let list = [];
+                let unavailable_dates = [];
                 let availability = 0;
+
                 props.main_user.forEach((user) => {
                     list.push(user.ac_token);
                 });
                 props.friends.forEach((friend) => {
                     list.push(friend.ac_token);
                 });
-    
-                Promise.all(list).each((items) => {
-                    oauth2Client.credentials = {"access_token": items};
-    
-                    return ev_controler.GetCalendarEvents(oauth2Client, startDate, endDate).then((events) => {
-                        if(events.length === 0){
-                            availability++;
-                        }
-                        else{
-                            let currentStartHour = moment(startDate).hours();
-                            let currentEndHour = moment(endDate).hours();
 
-                            Promise.each(events, (event) => {
-                                let checkStartHours = (currentStartHour+1 < event.startHour || currentStartHour+1 > event.startHour);
-                                let checkStartEndHours = (currentStartHour+1 < event.endHour || currentStartHour-1 > event.endHour);
-                                let checkEndStartHours =  (currentEndHour+1 < event.startHour || currentEndHour-1 < event.startHour);
-                                let checkEndEndHours =  (currentEndHour+1 < event.endHour || currentEndHour-1 < event.endHour);
-                                
-                                if(checkStartHours && checkStartEndHours){
-                                    if(checkEndStartHours && checkEndEndHours){
-                                        console.log('oysao');
-                                        availability++;
+                return Promise.all(list).each((items) => {
+                    oauth2Client.credentials = {"access_token": items};
+
+                    return Promise.each(dateRange, (range) => {
+                        console.log(range);
+                        return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate).then((events) => {
+                            if(events.length === 0){
+                                return;
+                            }
+                            else if(events.length > 0){
+                                let currentStartHour = moment(startDate).hours();
+                                let currentEndHour = moment(endDate).hours();
+
+                                Promise.each(events, (event) => {
+                                    let checkStartHours = (currentStartHour+1 < event.startHour || currentStartHour+1 > event.startHour);
+                                    let checkStartEndHours = (currentStartHour+1 < event.endHour || currentStartHour-1 > event.endHour);
+                                    let checkEndStartHours =  (currentEndHour+1 < event.startHour || currentEndHour-1 < event.startHour);
+                                    let checkEndEndHours =  (currentEndHour+1 < event.endHour || currentEndHour-1 < event.endHour);
+                                    
+                                    if(checkStartHours && checkStartEndHours){
+                                        if(checkEndStartHours && checkEndEndHours){
+                                            console.log('oysao');
+                                            availability++;
+                                        }
+                                        else{
+                                            unavailable_dates.push(range);
+                                        }
                                     }
-                                }
-                            });
-                        }
-                        console.log(events);
+                                    else{
+                                        unavailable_dates.push(range);
+                                    }
+                                });
+                            }
+                            else{
+                                unavailable_dates.push(range);
+                            }
+                        });
                     });
-                }).then(() => { 
-                    if(availability === list.length){
+                }).then(() => {
+                    console.log(unavailable_dates);
+                    if(unavailable_dates.length === 0){
                         res.json({
                             message: 'Available Date'
                         });
                     }
                     else{
                         res.json({
-                            message: 'Unavailable Date'
+                            message: 'Unavailable Date',
+                            data: unavailable_dates
                         });
                     }
-                    console.log(availability);
                 });
             });
         }).catch((e) => {
