@@ -88,11 +88,6 @@ exports.registerRoutes = function(app, config) {
                     res.json({message: "Invalid Available Time. Try again!"});
                     return;
                 }
-                else{
-                    formatDateWithTime(startDate, endDate, diffDate, available_time).then((v) => {
-                        dateRange = v;
-                    });
-                }
             });
         }
         else{
@@ -144,6 +139,10 @@ exports.registerRoutes = function(app, config) {
                 let unavailable_dates = [];
                 let availability = 0;
 
+                formatDateWithTime(startDate, diffDate, available_time).then((v) => {
+                    dateRange = v;
+                });
+
                 props.main_user.forEach((user) => {
                     list.push(user.ac_token);
                 });
@@ -155,42 +154,14 @@ exports.registerRoutes = function(app, config) {
                     oauth2Client.credentials = {"access_token": items};
 
                     return Promise.each(dateRange, (range) => {
-                        console.log(range);
                         return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate).then((events) => {
-                            if(events.length === 0){
-                                return;
-                            }
-                            else if(events.length > 0){
-                                let currentStartHour = moment(range.startDate).hours();
-                                let currentEndHour = moment(range.endDate).hours();
-                                
-                                Promise.each(events, (event) => {
-                                    let checkStartHours = (currentStartHour+1 < event.startHour || currentStartHour+1 > event.startHour);
-                                    let checkStartEndHours = (currentStartHour+1 < event.endHour || currentStartHour-1 > event.endHour);
-                                    let checkEndStartHours =  (currentEndHour+1 < event.startHour || currentEndHour-1 < event.startHour);
-                                    let checkEndEndHours =  (currentEndHour+1 < event.endHour || currentEndHour-1 < event.endHour);
-                                    
-                                    if(checkStartHours && checkStartEndHours){
-                                        if(checkEndStartHours && checkEndEndHours){
-                                            console.log('oysao');
-                                            availability++;
-                                        }
-                                        else{
-                                            unavailable_dates.push(range);
-                                        }
-                                    }
-                                    else{
-                                        unavailable_dates.push(range);
-                                    }
-                                    console.log(event);
-                                });
-                                
-                            }
-                            else{
-                                unavailable_dates.push(range);
-                            }
-                        });
-                    });
+                            ev_controler.searchDateAvailability(events, range).then((va) =>{
+                                if(va.length > 0){
+                                    unavailable_dates = va;
+                                }
+                            });
+                        })
+                    })
                 }).then(() => {
                     // console.log(unavailable_dates);
                     if(unavailable_dates.length === 0){
@@ -204,6 +175,8 @@ exports.registerRoutes = function(app, config) {
                             data: unavailable_dates
                         });
                     }
+                }).catch((e) => {
+                    console.log(e);
                 });
             });
         }).catch((e) => {

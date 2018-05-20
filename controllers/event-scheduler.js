@@ -46,3 +46,41 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
         });
     });
 }
+
+exports.searchDateAvailability = (events, range) => {
+    if(events.length === 0){
+        return Promise.resolve([]);
+    }
+    else if(events.length > 0){
+        let currentStartHour = moment(range.startDate).hours();
+        let currentEndHour = moment(range.endDate).hours();
+        
+        return Promise.map(events, (event) => {
+            let checkStartHours = (currentStartHour+1 < event.startHour || currentStartHour+1 > event.startHour);
+            let checkStartEndHours = (currentStartHour+1 < event.endHour || currentStartHour+1 > event.endHour);
+            let checkEndStartHours =  (currentEndHour+1 < event.startHour || currentEndHour-1 < event.startHour);
+            let checkEndEndHours =  (currentEndHour+1 < event.endHour || currentEndHour-1 < event.endHour);
+
+            console.log(moment(event.startDate).isBetween(range.startDate, range.endDate, null, '()'))
+            console.log(moment(event.endDate).isBetween(range.startDate, range.endDate, null, '()'))
+
+            if(checkStartHours && checkStartEndHours){
+                console.log("la")
+                if(checkEndStartHours && checkEndEndHours){
+                    console.log('oysao');
+                    return;
+                }
+                else{
+                    return range;
+                }
+            }
+            else{
+                return range;
+            }
+            // console.log(event);
+        });
+        
+    }
+
+    // return Promise.all
+}
