@@ -52,35 +52,18 @@ exports.searchDateAvailability = (events, range) => {
         return Promise.resolve([]);
     }
     else if(events.length > 0){
-        let currentStartHour = moment(range.startDate).hours();
-        let currentEndHour = moment(range.endDate).hours();
-        
         return Promise.map(events, (event) => {
-            let checkStartHours = (currentStartHour+1 < event.startHour || currentStartHour+1 > event.startHour);
-            let checkStartEndHours = (currentStartHour+1 < event.endHour || currentStartHour+1 > event.endHour);
-            let checkEndStartHours =  (currentEndHour+1 < event.startHour || currentEndHour-1 < event.startHour);
-            let checkEndEndHours =  (currentEndHour+1 < event.endHour || currentEndHour-1 < event.endHour);
+            let isBetweenStartDate = moment(event.startDate).isBetween(range.startDate, range.endDate, null, '[]');
+            let isBetweenEndDate = moment(event.endDate).isBetween(range.startDate, range.endDate, null, '[]');
 
-            console.log(moment(event.startDate).isBetween(range.startDate, range.endDate, null, '()'))
-            console.log(moment(event.endDate).isBetween(range.startDate, range.endDate, null, '()'))
-
-            if(checkStartHours && checkStartEndHours){
-                console.log("la")
-                if(checkEndStartHours && checkEndEndHours){
-                    console.log('oysao');
-                    return;
-                }
-                else{
-                    return range;
-                }
+            if(isBetweenStartDate && isBetweenEndDate){
+                console.log(`${moment(event.startDate).format('YYYY-MM-DD HH:mm')}-${moment(event.endDate).format('HH:mm')}`);
+                return `${moment(event.startDate).format('YYYY-MM-DD HH:mm')}-${moment(event.endDate).format('HH:mm')}`;
             }
             else{
-                return range;
+                console.log(`${moment(range.startDate).format('YYYY-MM-DD HH:mm')}-${moment(range.endDate).format('HH:mm')}`);
+                return `${moment(range.startDate).format('YYYY-MM-DD HH:mm')}-${moment(range.endDate).format('HH:mm')}`;
             }
-            // console.log(event);
         });
-        
     }
-
-    // return Promise.all
 }
