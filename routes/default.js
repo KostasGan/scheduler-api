@@ -135,23 +135,22 @@ exports.registerRoutes = function(app, config) {
                 main_user: main_user,        
                 friends: friends
             }).then((props) => {
-                let list = [];
+                let users_tokens = [];
                 let unavailable_dates = [];
-                let availability = 0;
 
                 formatDateWithTime(startDate, diffDate, available_time).then((v) => {
                     dateRange = v;
                 });
 
                 props.main_user.forEach((user) => {
-                    list.push(user.ac_token);
+                    users_tokens.push(user.ac_token);
                 });
                 props.friends.forEach((friend) => {
-                    list.push(friend.ac_token);
+                    users_tokens.push(friend.ac_token);
                 });
 
-                return Promise.all(list).each((items) => {
-                    oauth2Client.credentials = {"access_token": items};
+                return Promise.all(users_tokens).each((token) => {
+                    oauth2Client.credentials = {"access_token": token};
 
                     return Promise.each(dateRange, (range) => {
                         return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate).then((events) => {
@@ -166,11 +165,14 @@ exports.registerRoutes = function(app, config) {
                     // console.log(unavailable_dates);
                     if(unavailable_dates.length === 0){
                         res.json({
-                            message: 'Available Date'
+                            status: "success",
+                            message: 'Available Date',
+                            data: unavailable_dates
                         });
                     }
                     else{
                         res.json({
+                            status: "success",
                             message: 'Unavailable Date',
                             data: unavailable_dates
                         });
