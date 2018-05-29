@@ -176,8 +176,33 @@
             xhr.setRequestHeader("Content-type", "application/json");
             xhr.setRequestHeader("X-Access-Token", access_token);
             xhr.onreadystatechange = function() {
+                document.querySelector(".btn").removeAttribute('disabled');
+                let response = JSON.parse(xhr.response);
+
                 if (xhr.readyState == 4 && xhr.status == 200) {
-                    console.log(xhr.response);
+                    if(response.status === "error"){
+                        document.getElementById('resp_msg').style.color = "red";
+                        document.getElementById('resp_msg').innerHTML = response.message;
+                    }
+                    else if(response.data.length > 0){
+                        let message = "Dates are available except:\n";
+
+                        response.data.forEach(function(dates){
+                            message = message + "<li >"+ dates + "</li>";
+                        });
+                        document.getElementById('resp_msg').innerHTML = message;
+                        document.getElementById('resp_msg').style.color = "black";
+                    }
+                    else{
+                        document.getElementById('resp_msg').innerHTML = response.message;
+                        document.getElementById('resp_msg').style.color = "black";
+                    }
+                }
+
+                if (xhr.readyState == 4 && xhr.status == 401) {
+                    if(response.error_code === "unauthorized_friends" && response.data.users.length > 0){
+                        confirm("Some Attendees haven't active session or permission. Do you want to send invitation ? ");
+                    }
                 }
             };
             xhr.ontimeout = function (e) {
@@ -259,6 +284,11 @@
                     <button type="submit" class="btn btn-primary" >Submit</button>
                 </div>
             </div>
+            <div class="form-group msg">
+                <div class="sk col">
+                   <span id="resp_msg"></span>
+                </div>
+            </div>
         </form>
     </div>
     <footer>
@@ -298,7 +328,7 @@
                     if(!event_start && !event_end){
                        let value = document.getElementById('event_date').value;
                        let spltVal = value.split(" - ");
-                       
+
                        event_start = moment(spltVal[0], 'DD-MM-YYYY').format('YYYY-MM-DD').toString();
                        event_end = moment(spltVal[1], 'DD-MM-YYYY').format('YYYY-MM-DD').toString();
                     }
@@ -310,7 +340,8 @@
                         available_time: available_time,
                         attendees: attendees
                     };
-
+                    
+                    document.querySelector(".btn").setAttribute('disabled', true);
                     submitForm(data);
                 }
             }, true);

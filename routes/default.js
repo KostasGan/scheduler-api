@@ -78,26 +78,38 @@ exports.registerRoutes = function(app, config) {
         let dateRange = [];
 
         if(access_token === "" || startDate === "" || endDate === "" || attendees === ""){
-            res.json({message: "Bad Request. Please try again!"});
+            res.json({
+                status: "error",
+                message: "Bad Request. Please try again!"
+            });
             return; 
         }
         
         if(available_time.length > diffDate){
             checkAvailableTime(available_time).then((val) => { 
                 if (val > 0){
-                    res.json({message: "Invalid Available Time. Try again!"});
+                    res.json({
+                        status: "error",
+                        message: "Invalid Available Time. Try again!"
+                    });
                     return;
                 }
             });
         }
         else{
-            res.json({message: "Invalid Available Time. Try again!"});
+            res.json({
+                status: "error",
+                message: "Available Time is less than Event Date range.  Try again!"
+            });
             return;
         }
 
         checkValidEmails(attendees).then((val) => {
             if (val > 0){
-                res.json({message: "Invalid Attendees emails. Try again!"});
+                res.json({
+                    status: "error",
+                    message: "Invalid Attendees emails. Try again!"
+                });
                 return;
             }
         });
