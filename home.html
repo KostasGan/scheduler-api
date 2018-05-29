@@ -295,14 +295,14 @@
                 else{
                     let event_duration = document.getElementById('duration').value;
                     
-                   if(!event_start && !event_end){
+                    if(!event_start && !event_end){
                        let value = document.getElementById('event_date').value;
                        let spltVal = value.split(" - ");
-
-                       event_start = moment(spltVal[0]).format('YYYY-MM-DD').toString();
-                       event_end = moment(spltVal[1]).format('YYYY-MM-DD').toString();
-                   }
-
+                       
+                       event_start = moment(spltVal[0], 'DD-MM-YYYY').format('YYYY-MM-DD').toString();
+                       event_end = moment(spltVal[1], 'DD-MM-YYYY').format('YYYY-MM-DD').toString();
+                    }
+                    
                     let data = {
                         event_start: event_start,
                         event_end: event_end,
