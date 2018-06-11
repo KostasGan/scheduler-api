@@ -153,9 +153,8 @@ exports.registerRoutes = function(app, config) {
                     dateRange = v;
                 });
 
-                props.main_user.forEach((user) => {
-                    users_tokens.push(user.ac_token);
-                });
+                users_tokens.push(props.main_user ? props.main_user.ac_token : "");
+                
                 props.friends.forEach((friend) => {
                     users_tokens.push(friend.ac_token);
                 });
@@ -177,14 +176,14 @@ exports.registerRoutes = function(app, config) {
                     if(unavailable_dates.length === 0){
                         res.json({
                             status: "success",
-                            message: 'Available Date',
+                            message: "Available Date",
                             data: unavailable_dates
                         });
                     }
                     else{
                         res.json({
                             status: "success",
-                            message: 'Unavailable Date',
+                            message: "Unavailable Date",
                             data: unavailable_dates
                         });
                     }
