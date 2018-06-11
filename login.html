@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Event Scheduler</title>
+  <meta charset='utf-8' />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <!--link rel="stylesheet" type="text/css" href="mystyle.css"-->
+  <script async defer src="https://apis.google.com/js/platform.js?onload=handleClientLoad"></script>
+  <style>
+    body {
+      background-color: #EBEBEB;
+      overflow-y: hidden;
+    }
+
+    .flex {
+      height: 85vh;
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .box-login {
+      text-align: center;
+    }
+
+    #authorize-button {
+      margin: 0 auto;
+      display: block;
+    }
+
+    div {
+      margin-bottom: 10px;
+      color:black;
+    }
+
+    #error {
+      color: orange;
+      margin: 16px 0 0 0;
+      font-size: 15px;
+    }
+
+    h1 {
+      color: black;
+      font-size: 20px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  </style>
+
+  <script type="text/javascript">
+    // Client ID and API key from the Developer Console
+    var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
+
+    // Authorization scopes required by the API; multiple scopes can be
+    // included, separated by spaces.
+    var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+
+    function onSuccess(googleUser) {
+      let access_token = googleUser.getAuthResponse().access_token;
+      let login = gapi.auth2.getAuthInstance().isSignedIn.get();
+
+      if (login) {
+        // window.location.pathname = '/home.html';
+      }
+
+      let xhr = new XMLHttpRequest();
+      xhr.open('POST',
+        'http://localhost:8080/gauthredirect', true);
+      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhr.onreadystatechange = function (e) {
+        if (e.status === 'Failed') {
+          var pre = document.getElementById('content');
+          var textContent = document.createTextNode('Unauthorized \n');
+          pre.appendChild(textContent);
+        }
+        else {
+          let date = new Date();
+          date.setTime(date.getTime() + 3600000);
+
+          let exp = "expires="+date.toUTCString();
+
+          document.cookie = "G_AUTH=true;" + exp + ";path=/"
+
+          window.location.pathname = '/home.html';
+        }
+      };
+      xhr.send('access_token=' + access_token);
+    };
+
+    function onFailure(error) {
+      document.getElementById('error').innerHTML = 'Please make sure you sign in via Google';
+    };
+
+    function initClient() {
+      gapi.signin2.render('authorize-button', {
+        'scope': SCOPES,
+        'width': 250,
+        'height': 40,
+        'longtitle': true,
+        'theme': 'light',
+        'onsuccess': onSuccess,
+        'onfailure': onFailure
+      });
+    };
+    function handleClientLoad() {
+      gapi.load('auth2', () => {
+        gapi.auth2.init({
+          'client_id': CLIENT_ID,
+          'prompt': 'select_account'
+        }).then((googleAuth) => {
+          if (!googleAuth.isSignedIn.get()) {
+            initClient();
+          }
+          else {
+            // window.location.pathname = '/home';
+            console.log('skatataa');
+          }
+        }).catch((e) => {
+          console.log('Login Page says: ' + e)
+        });
+      }, (e) => {
+        console.log(e);
+      });
+    };
+
+    window.onbeforeunload = (e) => {
+      //gapi.auth2.getAuthInstance().signOut();
+    };
+  </script>
+  
+</head>
+
+<body>
+  <!--Add buttons to initiate auth sequence and sign out-->
+  <div class="flex">
+    <div class="box-login">
+      <img src="calendar-icon.png" width="100" height="100">
+      <h1>Event Scheduler</h1>
+      <div id="authorize-button"> </div>
+      <div id="error"></div>
+    </div>
+  </div>
+</body>
+</html>
