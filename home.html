@@ -177,9 +177,10 @@
             xhr.setRequestHeader("X-Access-Token", access_token);
             xhr.onreadystatechange = function() {
                 document.querySelector(".btn").removeAttribute('disabled');
-                let response = JSON.parse(xhr.response);
-
+                
                 if (xhr.readyState == 4 && xhr.status == 200) {
+                    let response = JSON.parse(xhr.response);
+
                     if(response.status === "error"){
                         document.getElementById('resp_msg').style.color = "red";
                         document.getElementById('resp_msg').innerHTML = response.message;
@@ -200,13 +201,16 @@
                 }
 
                 if (xhr.readyState == 4 && xhr.status == 401) {
+                    let response = JSON.parse(xhr.response);
+
                     if(response.error_code === "unauthorized_friends" && response.data.users.length > 0){
                         confirm("Some Attendees haven't active session or permission. Do you want to send invitation ? ");
                     }
                 }
             };
             xhr.ontimeout = function (e) {
-                // XMLHttpRequest timed out. Do something here.
+                document.getElementById('resp_msg').style.color = "red";
+                document.getElementById('resp_msg').innerHTML = 'Huston we have a problem...! Try again later.';
             };
             xhr.send(JSON.stringify(data));
         }
