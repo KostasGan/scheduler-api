@@ -71,7 +71,6 @@ exports.registerRoutes = function(app, config) {
         let duration = parseInt(body.event_duration, 10) || 1;
         let available_time = body.available_time.split(",") || "";
         let attendees = body.attendees || ""  ;
-        let friends_list = "kostasgan@e-food.gr"
         access_token = req.get('X-Access-Token') || "";
         
         let diffDate = endDate.diff(startDate,"day");
@@ -116,7 +115,7 @@ exports.registerRoutes = function(app, config) {
 
         let oauth2Client = initGoogleAuth(credentials);
         let friends = userModel.findFriendsAccessToken(attendees);
-        let main_user = userModel.findFriendsAccessToken(friends_list);
+        let main_user = userModel.findUserByAccessToken(access_token);
 
         friends.filter((friend) => {
             oauth2Client.credentials = {"access_token": friend.ac_token};

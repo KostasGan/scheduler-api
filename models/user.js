@@ -19,6 +19,14 @@ UserSchema.statics.findUser = function(email) {
         return 'Failed';
     });
 }
+UserSchema.statics.findUserByAccessToken = function(access_token) {
+    return user.findOne({ ac_token: access_token }).then((user) => {
+        return user;
+    }).catch((e) => {
+        console.log('We have a problem \n' + e);
+        return 'Failed';
+    });
+}
 
 UserSchema.statics.UpdateUser = (email,token) => {
     user.update({ email: email }, {ac_token: token}).then((response) => {
@@ -54,7 +62,6 @@ UserSchema.statics.findFriendsAccessToken = (friends_emails) => {
         });
     });
 }
-
 
 user = db.mongoose.model('calendar_users', UserSchema);
 
