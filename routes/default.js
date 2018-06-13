@@ -121,7 +121,7 @@ exports.registerRoutes = function(app, config) {
             oauth2Client.credentials = {"access_token": friend.ac_token};
 
             return auth.checkAuthToken(oauth2Client).then((val) =>{
-                if(val.message === "Invalid Credentials"){
+                if(val === "Invalid Credentials"){
                     return friend.email;
                 }
                 return;

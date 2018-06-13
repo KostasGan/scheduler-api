@@ -72,24 +72,15 @@ exports.checkAuthToken = (oauth2Client) => {
         request.post(options, function (error, response, body) {
             let data = JSON.parse(body);
             if(!error && response.statusCode === 400 && data.error_description === "Invalid Value"){
-                resolve({
-                    "status": "success",
-                    "message": "Invalid Credentials"
-                });
+                resolve("Invalid Credentials");
                 return;
             }
             else if(!error && response.statusCode === 200){
-                resolve({
-                    "status": "success",
-                    "message": "Valid User"
-                });
+                resolve("Valid User");
                 return;
             }
             else{
-                reject({
-                    "status": "error",
-                    "message": (JSON.parse(body)).error_description
-                });
+                reject((JSON.parse(body)).error_description);
                 return;
             }
         });
