@@ -1,8 +1,5 @@
 const express = require('express');
 const config = require('config');
-const Promise = require('bluebird');
-const google = require('googleapis');
-const googleAuth = require('google-auth-library');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
