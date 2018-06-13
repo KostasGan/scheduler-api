@@ -18,7 +18,7 @@ exports.send_Email = (config, email_list) => {
         from: username,
         to: email_list,
         subject: 'Invitation to Event-Scheduler',
-        html: '<p> An invitation for a new event schedule sent from X. We need permission to continue the process. </p><p>Login <a href="http://localhost:8000/login.html">here</a></p>' 
+        html: '<p> An invitation for a new event schedule sent. We need permission to continue the process. </p><p>To continue, login <a href="http://localhost:8000/login.html">here</a></p>' 
     };
     
     return new Promise((resolve,reject) =>{
