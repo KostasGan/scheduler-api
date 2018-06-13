@@ -16,5 +16,9 @@
         "host": "mongodb host url",
         "port": "port to mongodb",
         "db_name": ""
+    },
+    "email": {
+        "username": "username",
+        "password": "pass"
     }
 }

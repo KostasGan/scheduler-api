@@ -167,6 +167,7 @@
         }
 
         function submitForm(data) {
+            let response;
             let access_token = googleUser.getAuthResponse('includeAuthorizationData').access_token;
             
             let xhr = new XMLHttpRequest();
@@ -179,7 +180,7 @@
                 document.querySelector(".btn").removeAttribute('disabled');
                 
                 if (xhr.readyState == 4 && xhr.status == 200) {
-                    let response = JSON.parse(xhr.response);
+                    response = JSON.parse(xhr.response);
 
                     if(response.status === "error"){
                         document.getElementById('resp_msg').style.color = "red";
@@ -201,10 +202,26 @@
                 }
 
                 if (xhr.readyState == 4 && xhr.status == 401) {
-                    let response = JSON.parse(xhr.response);
+                    response = JSON.parse(xhr.response);
 
                     if(response.error_code === "unauthorized_friends" && response.data.users.length > 0){
-                        confirm("Some Attendees haven't active session or permission. Do you want to send invitation ? ");
+                        let r = confirm("Some Attendees haven't active session or permission. Do you want to send invitation ?");
+                        if(r){
+                            console.log('some');
+                            let xhr = new XMLHttpRequest();
+                            xhr.open('POST',
+                                'http://localhost:8080/api/send_email', true);
+                            xhr.timeout = 15000; // time in milliseconds
+                            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xhr.onreadystatechange = function() {
+                                console
+                                if (xhr.readyState == 4 && xhr.status == 200) {
+                                    response = JSON.parse(xhr.response);
+                                    document.getElementById('resp_msg').innerHTML = response.message;
+                                }
+                            }
+                            xhr.send("email_list=" + data.attendees);
+                        }
                     }
                 }
             };
