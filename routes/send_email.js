@@ -28,6 +28,6 @@ exports.registerRoutes = function(app, config) {
                 });
                 return;
             }
-        });
-    });
+        })
+    })
 }

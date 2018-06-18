@@ -18,8 +18,8 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
             if (err) {
                 console.log('The API returned an error: ' + err.message);
                 return reject({
-                    "status": "error",
-                    "message": err.message
+                    'status': 'error',
+                    'message': err.message
                 });
             }
 
@@ -28,7 +28,7 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
             if (events.length == 0) {
                 return resolve([]);
             } else {
-                return new Promise.map(events, (event) => {
+                return Promise.map(events, (event) => {
                     let startDate = moment(event.start.dateTime);
                     let endDate = moment(event.end.dateTime);
                     return {
@@ -41,10 +41,10 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
                     };
                 }).then((new_events) => {
                     return resolve(new_events);
-                });
+                })
             }
-        });
-    });
+        })
+    })
 }
 
 exports.searchDateAvailability = (events, range) => {
@@ -64,6 +64,6 @@ exports.searchDateAvailability = (events, range) => {
                 console.log(`${moment(range.startDate).format('YYYY-MM-DD HH:mm')}-${moment(range.endDate).format('HH:mm')}`);
                 return `${moment(range.startDate).format('YYYY-MM-DD HH:mm')}-${moment(range.endDate).format('HH:mm')}`;
             }
-        });
+        })
     }
 }

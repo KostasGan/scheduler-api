@@ -51,7 +51,7 @@ UserSchema.statics.findFriendsAccessToken = (friends_emails) => {
         return user.findUser(friend_mail).then((friend) => {
             if(friend === null){
                 console.log('Create New User');
-                return user.CreateUser(friend_mail, " ", []);
+                return user.CreateUser(friend_mail, ' ', []);
             }
             else{
                 return {
