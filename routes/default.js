@@ -133,10 +133,20 @@ exports.registerRoutes = function (app, config) {
                     }
                 }).catch((e) => {
                     console.log(e);
+                    res.json({
+                        status: 'error',
+                        message: 'Bad Request. Please try again!'
+                    });
+                    return;
                 });
             });
         }).catch((e) => {
             console.log(e);
+            res.json({
+                status: 'error',
+                message: 'Bad Request. Please try again!'
+            });
+            return;
         });
     });
 
