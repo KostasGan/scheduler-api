@@ -109,9 +109,9 @@ exports.registerRoutes = function (app, config) {
 
                     return Promise.each(dateRange, (range) => {
                         return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate).then((events) => {
-                            ev_controler.searchDateAvailability(events, range).then((va) => {
-                                if (va.length > 0) {
-                                    unavailable_dates = va;
+                            ev_controler.searchDateAvailability(events.events, range).then((data) => {
+                                if (data.length > 0) {
+                                    unavailable_dates = data;
                                 }
                             });
                         })

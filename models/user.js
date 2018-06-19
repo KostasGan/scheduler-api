@@ -35,7 +35,12 @@ UserSchema.statics.UpdateUser = (email,token) => {
 }
 
 UserSchema.statics.CreateUser = (email, access_token, friends_list) => {
-    new_user = new user({ email: email, ac_token: access_token, friends_list: friends_list || []});
+    new_user = new user({ 
+        email: email, 
+        ac_token: access_token, 
+        friends_list: friends_list || []
+    });
+    
     return new_user.save().then((s) => {
         return new_user;
     }).catch((e) => {
