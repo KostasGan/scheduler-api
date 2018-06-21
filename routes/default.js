@@ -38,8 +38,7 @@ exports.registerRoutes = function (app, config) {
                     return;
                 }
             });
-        }
-        else {
+        } else {
             res.json({
                 status: 'error',
                 message: 'Available Time is less than Event Date range.  Try again!'
@@ -123,8 +122,7 @@ exports.registerRoutes = function (app, config) {
                             message: 'Available Date',
                             data: unavailable_dates
                         });
-                    }
-                    else {
+                    } else {
                         res.json({
                             status: 'success',
                             message: 'Unavailable Date',
