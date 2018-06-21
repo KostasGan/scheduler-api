@@ -28,8 +28,8 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
             event._constructor(response.summary, events).then((new_events) =>{
                 return resolve(new_events);
             });
-        })
-    })
+        });
+    });
 }
 
 exports.searchDateAvailability = (events, range) => {
@@ -49,6 +49,6 @@ exports.searchDateAvailability = (events, range) => {
                 console.log(`${moment(range.startDate).format('YYYY-MM-DD HH:mm')}-${moment(range.endDate).format('HH:mm')}`);
                 return `${moment(range.startDate).format('YYYY-MM-DD HH:mm')}-${moment(range.endDate).format('HH:mm')}`;
             }
-        })
+        });
     }
 }

@@ -64,8 +64,8 @@ exports.authorizeClient = (oauth2Client) => {
             else {
                 reject({ 'status': 'Failed' });
             }
-        })
-    })
+        });
+    });
 }
 
 exports.checkAuthToken = (oauth2Client) => {
@@ -92,6 +92,6 @@ exports.checkAuthToken = (oauth2Client) => {
                 reject((JSON.parse(body)).error_description);
                 return;
             }
-        })
-    })
+        });
+    });
 }

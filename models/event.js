@@ -12,12 +12,12 @@ const EventSchema = new Schema({
     startHour: { type: Number, required: true },
     endDate: { type: Date, required: true },
     endDateHour: { type: Number, required: true }
-})
+});
 
 const EventListSchema = new Schema({
     email: { type: String, required: true },
     events: { type: [EventSchema], required: true }
-})
+});
 
 EventListSchema.statics._constructor = (email, events) => {
     return Promise.map(events, (event) => {
@@ -37,7 +37,7 @@ EventListSchema.statics._constructor = (email, events) => {
             email: email,
             events: new_events
         });
-    })
+    });
 }
 
 event = db.mongoose.model('events', EventListSchema);

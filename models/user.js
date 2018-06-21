@@ -19,6 +19,7 @@ UserSchema.statics.findUser = function(email) {
         return 'Failed';
     });
 }
+
 UserSchema.statics.findUserByAccessToken = function(access_token) {
     return user.findOne({ ac_token: access_token }).then((user) => {
         return user;

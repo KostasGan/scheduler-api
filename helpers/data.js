@@ -11,7 +11,7 @@ exports.checkValidEmails = (attendees) => {
         return;
     }).then(() => {
         return Promise.resolve(wrong_emails);
-    })
+    });
 }
 
 exports.checkAvailableTime = (available_time) => {
@@ -24,5 +24,5 @@ exports.checkAvailableTime = (available_time) => {
         return;
     }).then(() => {
         return Promise.resolve(wrong_times);
-    })
+    });
 }
