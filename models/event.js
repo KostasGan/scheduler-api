@@ -1,17 +1,17 @@
 const db = require('../helpers/db');
 const Promise = require('bluebird');
+const moment = require('moment');
 const Schema = db.mongoose.Schema;
 
-const event;
+let event;
 
 const EventSchema = new Schema({
-    email: { type: String, required: true },
+    event_id: { type: String, required: true },
     summary: { type: String, required: true },
-    description: { type: String },
     startDate: { type: Date, required: true },
-    startHour: { type: Date, required: true },
+    startHour: { type: Number, required: true },
     endDate: { type: Date, required: true },
-    endDateHour: { type: Date, required: true }
+    endDateHour: { type: Number, required: true }
 });
 
 const EventListSchema = new Schema({
@@ -19,18 +19,26 @@ const EventListSchema = new Schema({
     events: { type: [EventSchema], required: true }
 });
 
+EventListSchema.statics._constructor = (email, events) => {
+    return Promise.map(events, (event) => {
+        let startDate = moment(event.start.dateTime);
+        let endDate = moment(event.end.dateTime);
 
-EventSchema.statics.DateToTime = () => {
-    Promise.map(this.event, (event) => {
         return {
-            event: this.event,
-            startDateTime: startDate.getTime(),
-            endDateTime: endDate.getTime()
+            event_id: event.id,
+            summary: event.summary,
+            startDate: startDate.format('YYYY-MM-DD HH:mm'),
+            startHour: startDate.hour(),
+            endDate: endDate.format('YYYY-MM-DD HH:mm'),
+            endHour: endDate.hour()
         };
-    }).then((fevent)=>{
-        Promise.resolve(fevent);
+    }).then((new_events) => {
+        return new event({
+            email: email,
+            events: new_events
+        });
     });
 }
 
-event = db.mongoose.model('events', EventSchema);
+event = db.mongoose.model('events', EventListSchema);
 exports.Model = event;

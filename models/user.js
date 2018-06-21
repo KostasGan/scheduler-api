@@ -19,6 +19,7 @@ UserSchema.statics.findUser = function(email) {
         return 'Failed';
     });
 }
+
 UserSchema.statics.findUserByAccessToken = function(access_token) {
     return user.findOne({ ac_token: access_token }).then((user) => {
         return user;
@@ -35,7 +36,12 @@ UserSchema.statics.UpdateUser = (email,token) => {
 }
 
 UserSchema.statics.CreateUser = (email, access_token, friends_list) => {
-    new_user = new user({ email: email, ac_token: access_token, friends_list: friends_list || []});
+    new_user = new user({ 
+        email: email, 
+        ac_token: access_token, 
+        friends_list: friends_list || []
+    });
+    
     return new_user.save().then((s) => {
         return new_user;
     }).catch((e) => {
@@ -51,7 +57,7 @@ UserSchema.statics.findFriendsAccessToken = (friends_emails) => {
         return user.findUser(friend_mail).then((friend) => {
             if(friend === null){
                 console.log('Create New User');
-                return user.CreateUser(friend_mail, " ", []);
+                return user.CreateUser(friend_mail, ' ', []);
             }
             else{
                 return {

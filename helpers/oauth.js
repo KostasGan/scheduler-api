@@ -1,10 +1,20 @@
+const googleAuth = require('google-auth-library');
 const request = require('request');
 const Promise = require('bluebird');
 const userModel = require('../models/user').Model;
 
-let resp, options;
-let url = 'https://www.googleapis.com/oauth2/v2/tokeninfo';
+let resp; 
+let options;
 let access_token;
+let url = 'https://www.googleapis.com/oauth2/v2/tokeninfo';
+
+exports.initGoogleAuth = (config) => {
+    let credentials = config.get('web');
+    let auth = new googleAuth();
+    let googleOauth2Client = new auth.OAuth2(credentials.client_id, credentials.client_secret, credentials.redirect_uris);
+
+    return googleOauth2Client;
+}
 
 exports.authorizeClient = (oauth2Client) => {
     access_token = oauth2Client.credentials.access_token;
@@ -18,10 +28,10 @@ exports.authorizeClient = (oauth2Client) => {
     return new Promise((resolve, reject) => {
         request.post(options, function (error, response, body) {
             if (!error && response.statusCode === 200) {
-                try{
+                try {
                     resp = JSON.parse(body);
                 }
-                catch(e){ 
+                catch (e) {
                     console.log('JSON parse failed \n' + e);
                 }
                 if (resp.audience === oauth2Client.clientId_) {
@@ -44,10 +54,10 @@ exports.authorizeClient = (oauth2Client) => {
                         console.log(e);
                     });
                 }
-                else{
+                else {
                     reject({
-                        "status": "error",
-                        "error_code": "bad_request"
+                        'status': 'error',
+                        'error_code': 'bad_request'
                     });
                 }
             }
@@ -56,8 +66,7 @@ exports.authorizeClient = (oauth2Client) => {
             }
         });
     });
-};
-
+}
 
 exports.checkAuthToken = (oauth2Client) => {
     access_token = oauth2Client.credentials.access_token;
@@ -71,25 +80,16 @@ exports.checkAuthToken = (oauth2Client) => {
     return new Promise((resolve, reject) => {
         request.post(options, function (error, response, body) {
             let data = JSON.parse(body);
-            if(!error && response.statusCode === 400 && data.error_description === "Invalid Value"){
-                resolve({
-                    "status": "success",
-                    "message": "Invalid Credentials"
-                });
+            if (!error && response.statusCode === 400 && data.error_description === 'Invalid Value') {
+                resolve('Invalid Credentials');
                 return;
             }
-            else if(!error && response.statusCode === 200){
-                resolve({
-                    "status": "success",
-                    "message": "Valid User"
-                });
+            else if (!error && response.statusCode === 200) {
+                resolve('Valid User');
                 return;
             }
-            else{
-                reject({
-                    "status": "error",
-                    "message": (JSON.parse(body)).error_description
-                });
+            else {
+                reject((JSON.parse(body)).error_description);
                 return;
             }
         });

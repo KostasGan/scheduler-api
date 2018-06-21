@@ -1,6 +1,7 @@
 const google = require('googleapis');
 const Promise = require('bluebird');
 const moment = require('moment');
+const event = require('../models/event').Model;
 
 let calendar = google.calendar('v3');
 
@@ -18,31 +19,15 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
             if (err) {
                 console.log('The API returned an error: ' + err.message);
                 return reject({
-                    "status": "error",
-                    "message": err.message
+                    'status': 'error',
+                    'message': err.message
                 });
             }
-
             let events = response.items || [];
-
-            if (events.length == 0) {
-                return resolve([]);
-            } else {
-                return new Promise.map(events, (event) => {
-                    let startDate = moment(event.start.dateTime);
-                    let endDate = moment(event.end.dateTime);
-                    return {
-                        event_id: event.id,
-                        summary: event.summary,
-                        startDate: startDate.format('YYYY-MM-DD HH:mm'),
-                        startHour: startDate.hour(),
-                        endDate: endDate.format('YYYY-MM-DD HH:mm'),
-                        endHour: endDate.hour()
-                    };
-                }).then((new_events) => {
-                    return resolve(new_events);
-                });
-            }
+            
+            event._constructor(response.summary, events).then((new_events) =>{
+                return resolve(new_events);
+            });
         });
     });
 }

@@ -1,8 +1,6 @@
 const config = require('config');
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
-const Schema = mongoose.Schema;
-
 
 let uri = config.get('db.host') + ':' + config.get('db.port') + '/' + config.get('db.db_name');
 mongoose.connect(uri, { 
