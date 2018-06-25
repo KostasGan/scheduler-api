@@ -14,16 +14,16 @@ exports.registerRoutes = function (app, config) {
         let startDate = moment(body.event_start) || moment().toISOString();
         let endDate = moment(body.event_end) || moment().add(1, 'h').toISOString();
         let duration = parseInt(body.event_duration, 10) || 1;
-        let available_time = body.available_time.split(',') || '';
+        let available_time = body.available_time ? body.available_time.split(',') : '';
         let attendees = body.attendees || '';
-        access_token = req.get('X-Access-Token').trim() || '';
+        access_token = req.get('X-Access-Token') ? req.get('X-Access-Token').trim() : '';
 
         let diffDate = endDate.diff(startDate, 'day');
 
         if (access_token === '' || startDate === '' || endDate === '' || attendees === '') {
             res.json({
                 status: 'error',
-                message: 'Bad Request. Please try again!'
+                message: 'Bad Request. Some variables missing. Please try again!'
             });
             return;
         }
@@ -145,26 +145,6 @@ exports.registerRoutes = function (app, config) {
                 message: 'Bad Request. Please try again!'
             });
             return;
-        });
-    });
-
-    app.post('/gauthredirect', (req, res) => {
-
-        access_token = req.body.access_token.trim() || '';
-
-        if (access_token === '') {
-            res.json({ message: 'No access token. Please try again!' });
-            return;
-        }
-
-        let oauth2Client = auth.initGoogleAuth(config);
-        oauth2Client.credentials = { 'access_token': access_token };
-
-        auth.authorizeClient(oauth2Client).then((val) => {
-            res.json(val);
-        }).catch((error) => {
-            res.status(401);
-            res.json(error);
         });
     });
 }
