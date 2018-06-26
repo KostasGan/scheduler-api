@@ -159,7 +159,6 @@
 
             if (wrong_hours !== 0){
                 document.getElementById('available_time').classList.add('error');
-                return;
             }
             else{
                 document.getElementById('available_time').classList.remove('error');
@@ -214,7 +213,6 @@
                             xhr.timeout = 15000; // time in milliseconds
                             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                             xhr.onreadystatechange = function() {
-                                console
                                 if (xhr.readyState == 4 && xhr.status == 200) {
                                     response = JSON.parse(xhr.response);
                                     document.getElementById('resp_msg').innerHTML = response.message;
