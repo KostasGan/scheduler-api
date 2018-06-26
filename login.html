@@ -54,6 +54,8 @@
     // Authorization scopes required by the API; multiple scopes can be
     // included, separated by spaces.
     var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+    
+    var api = 'http://35.190.151.137:8080';
 
     function onSuccess(googleUser) {
       let access_token = googleUser.getAuthResponse().access_token;
@@ -64,8 +66,7 @@
       }
 
       let xhr = new XMLHttpRequest();
-      xhr.open('POST',
-        'http://localhost:8080/gauthredirect', true);
+      xhr.open('POST', api + '/gauthredirect', true);
       xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       xhr.onreadystatechange = function (e) {
         if (e.status === 'Failed') {

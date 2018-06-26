@@ -6,8 +6,9 @@ exports.send_Email = (config, email_list) => {
     let password = config.get('email.password');
 
     let transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
         secure: true,
+        port:465,
         auth: {
             user: username,
             pass: password

@@ -116,6 +116,7 @@
     </style>
     <script>
         var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
+        var api = 'http://35.190.151.137:8080';
         var googleUser;
 
 
@@ -151,7 +152,7 @@
             let wrong_hours = 0;
 
             times.forEach((times) => {
-                if(!re.test(String(times).toLowerCase())){
+                if(!re.test(String(times).toLowerCase()) && times !== '0'){
                     wrong_hours++;
                 }
                 return;
@@ -170,8 +171,7 @@
             let access_token = googleUser.getAuthResponse('includeAuthorizationData').access_token;
             
             let xhr = new XMLHttpRequest();
-            xhr.open('POST',
-                'http://localhost:8080/', true);
+            xhr.open('POST', api, true);
             xhr.timeout = 15000; // time in milliseconds
             xhr.setRequestHeader("Content-type", "application/json");
             xhr.setRequestHeader("X-Access-Token", access_token);
@@ -209,7 +209,7 @@
                             console.log('some');
                             let xhr = new XMLHttpRequest();
                             xhr.open('POST',
-                                'http://localhost:8080/api/send_email', true);
+                                api + '/api/send_email', true);
                             xhr.timeout = 15000; // time in milliseconds
                             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                             xhr.onreadystatechange = function() {
@@ -287,14 +287,14 @@
                 <div class="col-12 col-sm-6">
                     <label for="available_time"> Available Time </label>
                     <input type="text" id="available_time" class="form-control" required>
-                    <small for="available_time" class="text-muted">eg."8:00-14:00, 0, ...". Zero for free days</small>
+                    <small for="available_time" class="text-muted">eg."8:00-14:00,0,...". Zero for free days</small>
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-12 col-sm-6">
                     <label for="attendees"> Attendees </label> 
                     <input type="text" id="attendees" class="form-control" required>
-                    <small for="attendees" class="text-muted">eg. 'test@test.com, test@test.com'</small>
+                    <small for="attendees" class="text-muted">eg. 'test@test.com,test@test.com'</small>
                     <div><span id="msg"></span></div>
                 </div>
             </div>
