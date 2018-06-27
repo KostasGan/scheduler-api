@@ -71,7 +71,7 @@
         else {
           let exp;
           let date = new Date();
-          date.setTime(date.getTime() + (googleUser.getAuthResponse(true)*1000));
+          date.setTime(date.getTime() + (googleUser.getAuthResponse(true).expires_in*1000));
 
           exp = "expires=" + date.toUTCString();
 
