@@ -55,30 +55,24 @@
     // included, separated by spaces.
     var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
     
-    var api = 'http://35.190.151.137:8080';
+    var api = 'http://localhost:8080';
 
     function onSuccess(googleUser) {
-      let access_token = googleUser.getAuthResponse().access_token;
-      let login = gapi.auth2.getAuthInstance().isSignedIn.get();
-
-      if (login) {
-        // window.location.pathname = '/home.html';
-      }
+      let access_token = googleUser.getAuthResponse(true).access_token;
 
       let xhr = new XMLHttpRequest();
       xhr.open('POST', api + '/gauthredirect', true);
       xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       xhr.onreadystatechange = function (e) {
         if (e.status === 'Failed') {
-          var pre = document.getElementById('content');
-          var textContent = document.createTextNode('Unauthorized \n');
-          pre.appendChild(textContent);
+          document.getElementById('error').innerHTML = 'Please make sure you signed in via Google';
         }
         else {
+          let exp;
           let date = new Date();
-          date.setTime(date.getTime() + 3600000);
+          date.setTime(date.getTime() + (googleUser.getAuthResponse(true)*1000));
 
-          let exp = "expires="+date.toUTCString();
+          exp = "expires=" + date.toUTCString();
 
           document.cookie = "G_AUTH=true;" + exp + ";path=/"
 
@@ -89,7 +83,7 @@
     };
 
     function onFailure(error) {
-      document.getElementById('error').innerHTML = 'Please make sure you sign in via Google';
+      document.getElementById('error').innerHTML = 'Please make sure you signed in via Google';
     };
 
     function initClient() {
@@ -113,8 +107,7 @@
             initClient();
           }
           else {
-            // window.location.pathname = '/home';
-            console.log('skatataa');
+            onSuccess(googleAuth.currentUser.get());
           }
         }).catch((e) => {
           console.log(e)
