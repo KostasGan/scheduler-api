@@ -36,17 +36,16 @@ exports.authorizeClient = (oauth2Client) => {
                             userModel.UpdateUser(resp.email, access_token);
                             resolve({ 'status': 'Validated User' });
                         }
-                        else if(user && user.ac_token === access_token){
+                        else if (user && user.ac_token === access_token) {
                             resolve({ 'status': 'Validated User' });
                         }
                         else {
                             userModel.CreateUser(resp.email, access_token).then((val) => {
-                                if (val === 'Complete') {
-                                    resolve({ 'status': 'Validated User' });
-                                }
-                                else {
+                                if (val !== 'Complete') {
                                     resolve({ 'status': 'Failed' });
                                 }
+                                
+                                resolve({ 'status': 'Validated User' });    
                             });
                         }
                     }).catch((e) => {
