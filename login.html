@@ -27,18 +27,21 @@
     }
 
     #authorize-button {
-      margin: 0 auto;
       display: block;
     }
 
+    #authorize-button > div {
+      margin: 0 auto;
+    }
+
     div {
-      margin-bottom: 10px;
+      margin-bottom: 10px;     
       color:black;
     }
 
     #error {
       color: orange;
-      margin: 16px 0 0 0;
+      margin-top: 10px;
       font-size: 15px;
     }
 
@@ -55,8 +58,8 @@
 
     // Authorization scopes required by the API; multiple scopes can be
     // included, separated by spaces.
-    var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
-    var api = 'http://35.190.151.137:8080';
+    var SCOPES = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.readonly";
+    var api = 'http://localhost:8080';
 
     function onSuccess(googleUser) {
       let access_token = googleUser.getAuthResponse(true).access_token;
@@ -64,20 +67,31 @@
       let xhr = new XMLHttpRequest();
       xhr.open('POST', api + '/api/user/auth', true);
       xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xhr.onreadystatechange = function (e) {
-        if (e.status === 'Failed') {
-          document.getElementById('error').innerHTML = 'Please make sure you signed in via Google';
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          let response = JSON.parse(xhr.response);
+
+          if (response.status === 'success') {
+            let exp;
+            let date = new Date();
+            date.setTime(date.getTime() + (googleUser.getAuthResponse(true).expires_in * 1000));
+
+            exp = "expires=" + date.toUTCString();
+
+            document.cookie = "G_AUTH=true;" + exp + ";path=/"
+
+            window.location.pathname = '/home.html';
+          }
         }
-        else {
-          let exp;
-          let date = new Date();
-          date.setTime(date.getTime() + (googleUser.getAuthResponse(true).expires_in*1000));
 
-          exp = "expires=" + date.toUTCString();
+        if (xhr.readyState === 4 && xhr.status === 400) {
+          let response = JSON.parse(xhr.response);
 
-          document.cookie = "G_AUTH=true;" + exp + ";path=/"
-
-          window.location.pathname = '/home.html';
+          if (response.status === 'error') {
+            gapi.auth2.getAuthInstance().signOut();
+            document.getElementById('error').innerHTML = 'Huston we have problem with Google Login. Try again!';
+            return;
+          }
         }
       };
       xhr.send('access_token=' + access_token);
@@ -132,7 +146,9 @@
       <img src="calendar-clock-icon.png" width="100" height="100">
       <h1>Event Scheduler</h1>
       <div id="authorize-button"> </div>
-      <div id="error"></div>
+      <div>
+        <span id="error"></span>
+      </div>
     </div>
   </div>
 </body>

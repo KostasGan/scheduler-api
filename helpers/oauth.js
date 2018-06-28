@@ -34,34 +34,31 @@ exports.authorizeClient = (oauth2Client) => {
                     userModel.findUser(resp.email).then((user) => {
                         if (user && user.ac_token !== access_token) {
                             userModel.UpdateUser(resp.email, access_token);
-                            resolve({ 'status': 'Validated User' });
+                            resolve('validated' );
                         }
                         else if (user && user.ac_token === access_token) {
-                            resolve({ 'status': 'Validated User' });
+                            resolve('validated');
                         }
                         else {
                             userModel.CreateUser(resp.email, access_token).then((val) => {
                                 if (val !== 'Complete') {
-                                    resolve({ 'status': 'Failed' });
+                                    reject('error');
                                 }
-                                
-                                resolve({ 'status': 'Validated User' });    
+
+                                resolve('validated');    
                             });
                         }
                     }).catch((e) => {
                         console.log(e);
+                        reject('error');
                     });
                 }
                 else {
-                    reject({
-                        'status': 'error',
-                        'error_code': 'bad_request'
-                    });
+                    reject('error');
                 }
             }
             else {
-                console.log(body);
-                reject({ 'status': 'Failed' });
+                reject('error');
             }
         });
     });
