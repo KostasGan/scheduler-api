@@ -11,7 +11,7 @@ let url = 'https://www.googleapis.com/oauth2/v2/tokeninfo';
 exports.initGoogleAuth = (config) => {
     let credentials = config.get('web');
     let auth = new googleAuth();
-    let googleOauth2Client = new auth.OAuth2(credentials.client_id, credentials.client_secret, credentials.redirect_uris);
+    let googleOauth2Client = new auth.OAuth2(credentials.client_id, credentials.client_secret);
 
     return googleOauth2Client;
 }
@@ -28,16 +28,15 @@ exports.authorizeClient = (oauth2Client) => {
     return new Promise((resolve, reject) => {
         request.post(options, function (error, response, body) {
             if (!error && response.statusCode === 200) {
-                try {
-                    resp = JSON.parse(body);
-                }
-                catch (e) {
-                    console.log('JSON parse failed \n' + e);
-                }
+                resp = JSON.parse(body);
+               
                 if (resp.audience === oauth2Client.clientId_) {
                     userModel.findUser(resp.email).then((user) => {
                         if (user && user.ac_token !== access_token) {
                             userModel.UpdateUser(resp.email, access_token);
+                            resolve({ 'status': 'Validated User' });
+                        }
+                        else if(user && user.ac_token === access_token){
                             resolve({ 'status': 'Validated User' });
                         }
                         else {
@@ -62,6 +61,7 @@ exports.authorizeClient = (oauth2Client) => {
                 }
             }
             else {
+                console.log(body);
                 reject({ 'status': 'Failed' });
             }
         });

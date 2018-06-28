@@ -3,8 +3,8 @@ const auth = require('../helpers/oauth');
 exports.registerRoutes = function (app, config) {
     let access_token;
 
-    app.post('/gauthredirect', (req, res) => {
-        access_token = req.body.access_token.trim() || '';
+    app.post('/api/user/auth', (req, res) => {
+        access_token = req.body.access_token ? req.body.access_token.trim() : '';
 
         if (access_token === '') {
             res.json({
