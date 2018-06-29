@@ -225,7 +225,7 @@
                     if (response.error_code === "unauthorized_friends" && response.data.users.length > 0) {
                         let r = confirm("Some Attendees haven't active session or permission. Do you want to send invitation ?");
                         if (r) {
-                            console.log('some');
+                            let unauthorized = response.data.users.toString();
                             let xhr = new XMLHttpRequest();
                             xhr.open('POST',
                                 api + '/api/send_email', true);
@@ -237,7 +237,7 @@
                                     document.getElementById('resp_msg').innerHTML = response.message;
                                 }
                             }
-                            xhr.send("email_list=" + data.attendees);
+                            xhr.send("email_list=" + unauthorized);
                         }
                     }
                 }
