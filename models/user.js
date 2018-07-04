@@ -42,7 +42,7 @@ UserSchema.statics.CreateUser = (email, access_token, friends_list) => {
         friends_list: friends_list || []
     });
     
-    return new_user.save().then((s) => {
+    return new_user.save().then(() => {
         return new_user;
     }).catch((e) => {
         console.log('We have a problem \n' + e);
@@ -60,10 +60,7 @@ UserSchema.statics.findFriendsAccessToken = (friends_emails) => {
                 return user.CreateUser(friend_mail, ' ', []);
             }
             else{
-                return {
-                    email: friend.email,
-                    ac_token: friend.ac_token
-                };
+                return friend;
             }         
         });
     });
