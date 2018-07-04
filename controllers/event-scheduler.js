@@ -1,6 +1,6 @@
 const google = require('googleapis');
 const Promise = require('bluebird');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const event = require('../models/event').Model;
 
 let calendar = google.calendar('v3');
@@ -36,17 +36,19 @@ exports.searchDateAvailability = (events, range) => {
         return Promise.resolve([]);
     }
     else if (events.length > 0) {
+        let timezone = 'Europe/Athens';
+
         return Promise.map(events, (event) => {
             let isBetweenStartDate = moment(event.startDate).isBetween(range.startDate, range.endDate, null, '[]');
             let isBetweenEndDate = moment(event.endDate).isBetween(range.startDate, range.endDate, null, '[]');
 
             if (isBetweenStartDate && isBetweenEndDate) {
                 // console.log(`${moment(event.startDate).format('YYYY-MM-DD HH:mm')}-${moment(event.endDate).format('HH:mm')}`);
-                return `${moment(event.startDate).format('YYYY-MM-DD HH:mm')}-${moment(event.endDate).format('HH:mm')}`;
+                return `${moment(event.startDate).tz(timezone).format('YYYY-MM-DD HH:mm')}-${moment(event.endDate).tz(timezone).format('HH:mm')}`;
             }
             else {
                 // console.log(`${moment(range.startDate).format('YYYY-MM-DD HH:mm')}-${moment(range.endDate).format('HH:mm')}`);
-                return `${moment(range.startDate).format('YYYY-MM-DD HH:mm')}-${moment(range.endDate).format('HH:mm')}`;
+                return `${moment(range.startDate).tz(timezone).format('YYYY-MM-DD HH:mm')}-${moment(range.endDate).tz(timezone).format('HH:mm')}`;
             }
         });
     }
