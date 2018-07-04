@@ -3,7 +3,7 @@ const request = require('request');
 const Promise = require('bluebird');
 const userModel = require('../models/user').Model;
 
-let resp; 
+let resp;
 let options;
 let access_token;
 let url = 'https://www.googleapis.com/oauth2/v2/tokeninfo';
@@ -29,12 +29,12 @@ exports.authorizeClient = (oauth2Client) => {
         request.post(options, function (error, response, body) {
             if (!error && response.statusCode === 200) {
                 resp = JSON.parse(body);
-               
+
                 if (resp.audience === oauth2Client.clientId_) {
                     userModel.findUser(resp.email).then((user) => {
                         if (user && user.ac_token !== access_token) {
                             userModel.UpdateUser(resp.email, access_token);
-                            resolve('validated' );
+                            resolve('validated');
                         }
                         else if (user && user.ac_token === access_token) {
                             resolve('validated');
@@ -45,7 +45,7 @@ exports.authorizeClient = (oauth2Client) => {
                                     reject('error');
                                 }
 
-                                resolve('validated');    
+                                resolve('validated');
                             });
                         }
                     }).catch((e) => {
