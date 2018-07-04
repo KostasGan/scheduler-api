@@ -191,7 +191,7 @@
 
             let xhr = new XMLHttpRequest();
             xhr.open('POST', api, true);
-            xhr.timeout = 15000; // time in milliseconds
+            xhr.timeout = 100000; // time in milliseconds
             xhr.setRequestHeader("Content-type", "application/json");
             xhr.setRequestHeader("X-Access-Token", access_token);
             xhr.onreadystatechange = function () {

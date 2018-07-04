@@ -124,16 +124,10 @@
           else {
             onSuccess(googleAuth.currentUser.get());
           }
-        }).catch((e) => {
-          console.log(e)
         });
       }, (e) => {
         console.log(e);
       });
-    };
-
-    window.onbeforeunload = (e) => {
-      //gapi.auth2.getAuthInstance().signOut();
     };
   </script>
   
