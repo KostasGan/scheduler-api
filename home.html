@@ -222,6 +222,11 @@
                 if (xhr.readyState == 4 && xhr.status == 401) {
                     response = JSON.parse(xhr.response);
 
+                    if (response.error_code === "main_user_not_found"){
+                        alert('Session expired. Please login again');
+                        window.location.pathname = '/login.html';
+                    }
+
                     if (response.error_code === "unauthorized_friends" && response.data.users.length > 0) {
                         let r = confirm("Some Attendees haven't active session or permission. Do you want to send invitation ?");
                         if (r) {
@@ -382,6 +387,7 @@
                         attendees: attendees
                     };
 
+                    document.getElementById('resp_msg').innerHTML = "";
                     document.querySelector(".btn").setAttribute('disabled', true);
                     submitForm(data);
                 }
