@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <!-- Img Link for reference https://icon-icons.com/icon/calendar-clock/34472 -->
   <title>Event Scheduler</title>
+  <link rel="icon" href="calendar-clock-icon.png">
   <meta charset='utf-8' />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <!--link rel="stylesheet" type="text/css" href="mystyle.css"-->
   <script async defer src="https://apis.google.com/js/platform.js?onload=handleClientLoad"></script>
   <style>
     body {
-      background-color: #EBEBEB;
+      background-color: #E8E8E8;
       overflow-y: hidden;
     }
 
@@ -25,18 +27,21 @@
     }
 
     #authorize-button {
-      margin: 0 auto;
       display: block;
     }
 
+    #authorize-button > div {
+      margin: 0 auto;
+    }
+
     div {
-      margin-bottom: 10px;
+      margin-bottom: 10px;     
       color:black;
     }
 
     #error {
       color: orange;
-      margin: 16px 0 0 0;
+      margin-top: 10px;
       font-size: 15px;
     }
 
@@ -53,42 +58,47 @@
 
     // Authorization scopes required by the API; multiple scopes can be
     // included, separated by spaces.
-    var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+    var SCOPES = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.readonly';
+    var api = 'http://35.190.151.137:8080';
 
     function onSuccess(googleUser) {
-      let access_token = googleUser.getAuthResponse().access_token;
-      let login = gapi.auth2.getAuthInstance().isSignedIn.get();
-
-      if (login) {
-        // window.location.pathname = '/home.html';
-      }
+      let access_token = googleUser.getAuthResponse(true).access_token;
 
       let xhr = new XMLHttpRequest();
-      xhr.open('POST',
-        'http://localhost:8080/gauthredirect', true);
-      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xhr.onreadystatechange = function (e) {
-        if (e.status === 'Failed') {
-          var pre = document.getElementById('content');
-          var textContent = document.createTextNode('Unauthorized \n');
-          pre.appendChild(textContent);
+      xhr.open('POST', api + '/api/user/auth', true);
+      xhr.setRequestHeader('X-Access-Token', access_token);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          let response = JSON.parse(xhr.response);
+
+          if (response.status === 'success') {
+            let exp;
+            let date = new Date();
+            date.setTime(date.getTime() + (googleUser.getAuthResponse(true).expires_in * 1000));
+
+            exp = 'expires=' + date.toUTCString();
+
+            document.cookie = 'G_AUTH=true;' + exp + ';path=/'
+
+            window.location.pathname = '/home.html';
+          }
         }
-        else {
-          let date = new Date();
-          date.setTime(date.getTime() + 3600000);
 
-          let exp = "expires="+date.toUTCString();
+        if (xhr.readyState === 4 && xhr.status === 400) {
+          let response = JSON.parse(xhr.response);
 
-          document.cookie = "G_AUTH=true;" + exp + ";path=/"
-
-          window.location.pathname = '/home.html';
+          if (response.status === 'error') {
+            gapi.auth2.getAuthInstance().signOut();
+            document.getElementById('error').innerHTML = 'Huston we have problem with Google Login. Try again!';
+            return;
+          }
         }
       };
-      xhr.send('access_token=' + access_token);
+      xhr.send();
     };
 
     function onFailure(error) {
-      document.getElementById('error').innerHTML = 'Please make sure you sign in via Google';
+      document.getElementById('error').innerHTML = 'Please make sure you signed in via Google';
     };
 
     function initClient() {
@@ -112,19 +122,12 @@
             initClient();
           }
           else {
-            // window.location.pathname = '/home';
-            console.log('skatataa');
+            onSuccess(googleAuth.currentUser.get());
           }
-        }).catch((e) => {
-          console.log('Login Page says: ' + e)
         });
       }, (e) => {
         console.log(e);
       });
-    };
-
-    window.onbeforeunload = (e) => {
-      //gapi.auth2.getAuthInstance().signOut();
     };
   </script>
   
@@ -134,10 +137,12 @@
   <!--Add buttons to initiate auth sequence and sign out-->
   <div class="flex">
     <div class="box-login">
-      <img src="calendar-icon.png" width="100" height="100">
+      <img src="calendar-clock-icon.png" width="100" height="100">
       <h1>Event Scheduler</h1>
       <div id="authorize-button"> </div>
-      <div id="error"></div>
+      <div>
+        <span id="error"></span>
+      </div>
     </div>
   </div>
 </body>

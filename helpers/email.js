@@ -4,10 +4,12 @@ const nodemailer = require('nodemailer');
 exports.send_Email = (config, email_list) => {
     let username = config.get('email.username');
     let password = config.get('email.password');
+    let page_url = config.get('page_url');
 
     let transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
         secure: true,
+        port:465,
         auth: {
             user: username,
             pass: password
@@ -18,7 +20,7 @@ exports.send_Email = (config, email_list) => {
         from: username,
         to: email_list,
         subject: 'Invitation to Event-Scheduler',
-        html: '<p> An invitation for a new event schedule sent. We need permission to continue the process. </p><p>To continue, login <a href="http://localhost:8000/login.html">here</a></p>' 
+        html: '<p> An invitation for a new event schedule sent. We need permission to continue the process. </p><p>To continue, login <a href="' + page_url + '/login.html">here</a></p>' 
     };
     
     return new Promise((resolve,reject) =>{

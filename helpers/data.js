@@ -18,7 +18,7 @@ exports.checkAvailableTime = (available_time) => {
     var re = /^(?:(([01]?\d|2[0-3]):([0-5]?\d))-(([01]?\d|2[0-3]):([0-5]?\d)))$/;
     let wrong_times = 0;
     return Promise.each(available_time, (time) => {
-        if (!re.test(String(time.trim()))) {
+        if (!re.test(String(time.trim())) && time !== '0') {
             wrong_times++;
         }
         return;

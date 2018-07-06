@@ -1,4 +1,6 @@
 {
+    "api_url": "http://some.com",
+    "page_url": "http://some.com",
     "web": {
         "client_id": "Google Client id goes here",
         "project_id": "Google project id goes here",
