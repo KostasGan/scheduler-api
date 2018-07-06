@@ -58,7 +58,7 @@
 
     // Authorization scopes required by the API; multiple scopes can be
     // included, separated by spaces.
-    var SCOPES = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.readonly";
+    var SCOPES = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.readonly';
     var api = 'http://35.190.151.137:8080';
 
     function onSuccess(googleUser) {
@@ -66,7 +66,7 @@
 
       let xhr = new XMLHttpRequest();
       xhr.open('POST', api + '/api/user/auth', true);
-      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhr.setRequestHeader('X-Access-Token', access_token);
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
           let response = JSON.parse(xhr.response);
@@ -76,9 +76,9 @@
             let date = new Date();
             date.setTime(date.getTime() + (googleUser.getAuthResponse(true).expires_in * 1000));
 
-            exp = "expires=" + date.toUTCString();
+            exp = 'expires=' + date.toUTCString();
 
-            document.cookie = "G_AUTH=true;" + exp + ";path=/"
+            document.cookie = 'G_AUTH=true;' + exp + ';path=/'
 
             window.location.pathname = '/home.html';
           }
@@ -94,7 +94,7 @@
           }
         }
       };
-      xhr.send('access_token=' + access_token);
+      xhr.send();
     };
 
     function onFailure(error) {

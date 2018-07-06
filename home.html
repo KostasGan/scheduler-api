@@ -136,7 +136,7 @@
     </style>
     <script>
         var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
-        var api = 'http://35.190.151.137:8080';
+        var api = 'http://localhost:8080';
         var googleUser;
 
         function SignOutUser() {
@@ -145,7 +145,7 @@
 
         function checkValidEmails(attendees) {
             var re = /^(([^<>()\[\]\\.:@"]+(\.[^<>()\[\]\\.:@"]+)*)|(".+"))@((\[[^0-9]{1,3}\.[^0-9]{1,3}\.[^0-9]{1,3}\.[^0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            let emails = attendees.trim().split(",");
+            let emails = attendees.trim().split(',');
             let wrong_emails = 0;
 
             emails.forEach((email) => {
@@ -157,8 +157,8 @@
 
             if (wrong_emails !== 0) {
                 document.getElementById('attendees').classList.add('error');
-                document.getElementById('msg').innerHTML = "Wrong Email";
-                document.getElementById('msg').style.color = "red";
+                document.getElementById('msg').innerHTML = 'Wrong Email';
+                document.getElementById('msg').style.color = 'red';
             }
             else {
                 document.getElementById('attendees').classList.remove('error');
@@ -167,7 +167,7 @@
 
         function checkAvailableTime(available_time) {
             var re = /^(?:(([01]?\d|2[0-3]):([0-5]?\d))-(([01]?\d|2[0-3]):([0-5]?\d)))$/;
-            let times = available_time.trim().split(",");
+            let times = available_time.trim().split(',');
             let wrong_hours = 0;
 
             times.forEach((times) => {
@@ -190,65 +190,65 @@
             let access_token = googleUser.getAuthResponse(true).access_token;
 
             let xhr = new XMLHttpRequest();
-            xhr.open('POST', api, true);
+            xhr.open('POST', api + '/api/events/scheduler', true);
             xhr.timeout = 100000; // time in milliseconds
-            xhr.setRequestHeader("Content-type", "application/json");
-            xhr.setRequestHeader("X-Access-Token", access_token);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.setRequestHeader('X-Access-Token', access_token);
             xhr.onreadystatechange = function () {
-                document.querySelector(".btn").removeAttribute('disabled');
+                document.querySelector('.btn').removeAttribute('disabled');
 
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     response = JSON.parse(xhr.response);
 
-                    if (response.status === "error") {
-                        document.getElementById('resp_msg').style.color = "red";
+                    if (response.status === 'error') {
+                        document.getElementById('resp_msg').style.color = 'red';
                         document.getElementById('resp_msg').innerHTML = response.message;
                     }
                     else if (response.data.length > 0) {
-                        let message = "Dates are available except:\n";
+                        let message = 'Dates are available except:\n';
 
                         response.data.forEach(function (dates) {
-                            message = message + "<li >" + dates + "</li>";
+                            message = message + '<li >' + dates + '</li>';
                         });
                         document.getElementById('resp_msg').innerHTML = message;
-                        document.getElementById('resp_msg').style.color = "black";
+                        document.getElementById('resp_msg').style.color = 'black';
                     }
                     else {
                         document.getElementById('resp_msg').innerHTML = response.message;
-                        document.getElementById('resp_msg').style.color = "black";
+                        document.getElementById('resp_msg').style.color = 'black';
                     }
                 }
 
                 if (xhr.readyState == 4 && xhr.status == 401) {
                     response = JSON.parse(xhr.response);
 
-                    if (response.error_code === "main_user_not_found"){
+                    if (response.error_code === 'main_user_not_found'){
                         alert('Session expired. Please login again');
                         window.location.pathname = '/login.html';
                     }
 
-                    if (response.error_code === "unauthorized_friends" && response.data.users.length > 0) {
+                    if (response.error_code === 'unauthorized_friends' && response.data.users.length > 0) {
                         let r = confirm("Some Attendees haven't active session or permission. Do you want to send invitation ?");
                         if (r) {
                             let unauthorized = response.data.users.toString();
                             let xhr = new XMLHttpRequest();
                             xhr.open('POST',
-                                api + '/api/send_email', true);
+                                api + '/api/user/invite', true);
                             xhr.timeout = 15000; // time in milliseconds
-                            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                             xhr.onreadystatechange = function () {
                                 if (xhr.readyState == 4 && xhr.status == 200) {
                                     response = JSON.parse(xhr.response);
                                     document.getElementById('resp_msg').innerHTML = response.message;
                                 }
                             }
-                            xhr.send("email_list=" + unauthorized);
+                            xhr.send('email_list=' + unauthorized);
                         }
                     }
                 }
             };
             xhr.ontimeout = function (e) {
-                document.getElementById('resp_msg').style.color = "red";
+                document.getElementById('resp_msg').style.color = 'red';
                 document.getElementById('resp_msg').innerHTML = 'Huston we have a problem...! Try again later.';
             };
             xhr.send(JSON.stringify(data));
@@ -260,7 +260,7 @@
                     'client_id': CLIENT_ID
                 }).then((googleAuth) => {
                     let cookie = document.cookie;
-                    let validCookie = cookie.indexOf("G_AUTH=true") != -1;
+                    let validCookie = cookie.indexOf('G_AUTH=true') != -1;
 
                     if (cookie && validCookie && googleAuth.isSignedIn.get()) {
                         googleUser = googleAuth.currentUser.get();
@@ -344,18 +344,18 @@
             let event_end;
 
             $('#event_date').daterangepicker({
-                "locale": {
-                    "format": "DD-MM-YYYY",
-                    "separator": " - ",
+                'locale': {
+                    'format': 'DD-MM-YYYY',
+                    'separator': ' - ',
                 },
-                "opens": "left",
-                "minDate": new moment()
+                'opens': 'left',
+                'minDate': new moment()
             }, function (start, end, label) {
                 event_start = start.format('YYYY-MM-DD');
                 event_end = end.format('YYYY-MM-DD');
             });
 
-            document.getElementById("form1").addEventListener('submit', function (event) {
+            document.getElementById('form1').addEventListener('submit', function (event) {
                 event.preventDefault();
 
                 let available_time = document.getElementById('available_time').value;
@@ -373,7 +373,7 @@
 
                     if (!event_start && !event_end) {
                         let value = document.getElementById('event_date').value;
-                        let spltVal = value.split(" - ");
+                        let spltVal = value.split(' - ');
 
                         event_start = moment(spltVal[0], 'DD-MM-YYYY').format('YYYY-MM-DD').toString();
                         event_end = moment(spltVal[1], 'DD-MM-YYYY').format('YYYY-MM-DD').toString();
@@ -387,8 +387,8 @@
                         attendees: attendees
                     };
 
-                    document.getElementById('resp_msg').innerHTML = "";
-                    document.querySelector(".btn").setAttribute('disabled', true);
+                    document.getElementById('resp_msg').innerHTML = '';
+                    document.querySelector('.btn').setAttribute('disabled', true);
                     submitForm(data);
                 }
             }, true);

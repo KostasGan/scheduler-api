@@ -8,17 +8,15 @@ const moment = require('moment');
 const join = Promise.join;
 
 exports.registerRoutes = function (app, config) {
-    let access_token;
-
-    app.post('/', (req, res) => {
+    app.use('/api/events/scheduler', (req, res, next) =>{
         let body = req.body;
-        let startDate = moment(body.event_start) || moment().toISOString();
-        let endDate = moment(body.event_end) || moment().add(1, 'h').toISOString();
+        let startDate = moment(body.event_start);
+        let endDate = moment(body.event_end);
         let diffDate = endDate.diff(startDate, 'day');
         let duration = parseInt(body.event_duration, 10) || 1;
         let available_time = body.available_time ? body.available_time.split(',') : '';
         let attendees = body.attendees || '';
-        access_token = req.get('X-Access-Token') ? req.get('X-Access-Token').trim() : '';
+        let access_token = res.locals.access_token;
 
         if (access_token === '' || startDate === '' || endDate === '' || attendees === '') {
             res.json({
@@ -26,7 +24,7 @@ exports.registerRoutes = function (app, config) {
                 message: 'Bad Request. Some variables missing. Please try again!'
             });
             return;
-        }
+        };
 
         if (available_time.length > diffDate) {
             data_helper.checkAvailableTime(available_time).then((val) => {
@@ -37,6 +35,15 @@ exports.registerRoutes = function (app, config) {
                     });
                     return;
                 }
+                res.locals.data = {
+                    'event_start': startDate,
+                    'event_end': endDate,
+                    'diffDate': diffDate,
+                    'event_duration': duration,
+                    'available_time': available_time,
+                    'attendees': attendees
+                }
+                next();
             });
         } else {
             res.json({
@@ -45,7 +52,17 @@ exports.registerRoutes = function (app, config) {
             });
             return;
         }
+    });
 
+    app.post('/api/events/scheduler', (req, res) => {
+        let body = res.locals.data;
+        let startDate = body.event_start; 
+        let endDate = body.event_end;
+        let diffDate = body.diffDate;
+        let duration = body.event_duration;
+        let available_time = body.available_time;
+        let attendees = body.attendees;
+        let access_token = res.locals.access_token;
 
         data_helper.checkValidEmails(attendees).then((val) => {
             if (val > 0) {
@@ -57,12 +74,10 @@ exports.registerRoutes = function (app, config) {
             }
             return {};
         }).then((val) => {
-            if(!val){
-                return;
-            }
+            if(!val) return;
 
             let oauth2Client = auth.initGoogleAuth(config);
-            let all_users = join(userModel.findFriendsAccessToken(attendees), userModel.findUserByAccessToken(access_token), (attendees, main_user) => {
+            let all_users = join(userModel.findUserByAccessToken(access_token), userModel.findFriendsAccessToken(attendees), (main_user, attendees) => {
                 if(main_user && attendees){
                     attendees.push(main_user);
                     return attendees;
@@ -106,53 +121,53 @@ exports.registerRoutes = function (app, config) {
                 return all_users;
             })
             .then((all_users) => {
-                if(!all_users || all_users.length === 0){
-                    return;
-                }
+                if(!all_users || all_users.length === 0) return;
 
                 let unavailable_dates = [];
                 let dateRange = date_helper.formatDateWithTime(startDate, diffDate, available_time);
 
                 return Promise.each(all_users, (token) => {
                     oauth2Client.credentials = { 'access_token': token.ac_token };
-
                     return Promise.each(dateRange, (range) => {
                         return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate)
                             .then((events) => {
-                                return ev_controler.searchDateAvailability(events.events, range)
+                                return ev_controler.searchDateAvailability(events.events, range);
                             })
                             .each((dt) => {
                                 if (!unavailable_dates.includes(dt)) {
                                     unavailable_dates.push(dt);
                                 }
-                                return;
                             });
                     });
                 })
                 .then(() => {
-                    if (unavailable_dates.length === 0) {
-                        res.json({
-                            status: 'success',
-                            message: 'Available Date',
-                            data: unavailable_dates
-                        });
-                    } else {
-                        res.json({
-                            status: 'success',
-                            message: 'Unavailable Date',
-                            data: unavailable_dates
-                        });
-                    }
-                });
+                    return new Promise.all(unavailable_dates);
+                })
             })
-            .catch((e) => {
-                console.log(e);
-                res.json({
-                    status: 'error',
-                    message: 'Bad Request. Please try again!'
-                });
-                return;
+            .then((unavailable_dates) => {
+                if(!unavailable_dates) return;
+
+                if (unavailable_dates.length === 0) {
+                    res.json({
+                        status: 'success',
+                        message: 'Available Date',
+                        data: unavailable_dates
+                    });
+                } else {
+                    res.json({
+                        status: 'success',
+                        message: 'Unavailable Date',
+                        data: unavailable_dates
+                    });
+                }
             });
+        }).catch((e) => {
+            console.log(e);
+            res.json({
+                status: 'error',
+                message: 'Bad Request. Please try again!'
+            });
+            return;
         });
     });
 }

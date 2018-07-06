@@ -1,7 +1,7 @@
 const Email = require('../helpers/email');
 
 exports.registerRoutes = function (app, config) {
-    app.post('/api/send_email', (req, res) => {
+    app.post('/api/user/invite', (req, res) => {
         let mail_list = req.body.email_list || '';
 
         if (mail_list === '') {

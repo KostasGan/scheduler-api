@@ -1,10 +1,8 @@
 const auth = require('../helpers/oauth');
 
 exports.registerRoutes = function (app, config) {
-    let access_token;
-
     app.post('/api/user/auth', (req, res) => {
-        access_token = req.body.access_token ? req.body.access_token.trim() : '';
+        let access_token = res.locals.access_token;
 
         if (access_token === '') {
             res.json({
