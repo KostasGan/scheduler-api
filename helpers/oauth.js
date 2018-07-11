@@ -41,7 +41,7 @@ exports.authorizeClient = (oauth2Client) => {
                         }
                         else {
                             userModel.CreateUser(resp.email, access_token).then((val) => {
-                                if (val !== 'Complete') {
+                                if (val === 'Failed') {
                                     reject('error');
                                 }
 
