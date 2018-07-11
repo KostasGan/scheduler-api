@@ -1,9 +1,9 @@
 const Promise = require('bluebird');
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 exports.formatDateWithTime = (startDate, diffDate, available_time) => {
     let range = [];
-
+    let timezone = 'America/New_York'
     for (let i = 0; i <= diffDate; i++) {
         let av_time = available_time[i].trim().split(/[":\-"]/);
         let newISOStartDate = startDate.toISOString();
@@ -14,8 +14,8 @@ exports.formatDateWithTime = (startDate, diffDate, available_time) => {
             new_date.set({ 'hour': av_time[0], 'minutes': av_time[1] });
             new_enddate.set({ 'hour': av_time[2], 'minutes': av_time[3] })
             range.push({
-                'startDate': new_date.toISOString(),
-                'endDate': new_enddate.toISOString()
+                'startDate': new_date.tz(timezone).format(),
+                'endDate': new_enddate.tz(timezone).format()
             });
         }
     }

@@ -69,6 +69,7 @@ exports.registerRoutes = function (app, config) {
             return Promise.each(all_users, (token) => {
                 oauth2Client.credentials = { 'access_token': token.ac_token };
                 return Promise.each(dateRange, (range) => {
+                    console.log(range);
                     return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate)
                         .then((events) => {
                             return ev_controler.searchDateAvailability(events.events, range);
