@@ -16,6 +16,7 @@ exports.formatUnavailableDates = (startDate, endDate) => {
 }
 
 exports.isBetwennTwoDates = (date, startRange, endRange) => {
+    console.log(moment(date).isBetween(startRange, endRange, null, '[]'));
     return moment(date).isBetween(startRange, endRange, null, '[]');
 }
 

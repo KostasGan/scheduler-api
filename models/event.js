@@ -23,8 +23,7 @@ EventListSchema.statics._constructor = (email, events) => {
     return Promise.map(events, (event) => {
         let startDate = date_helper.initDateWithTimezone(event.start.dateTime);
         let endDate = date_helper.initDateWithTimezone(event.end.dateTime);
-        console.log(startDate);
-        console.log(endDate);
+        
         return {
             event_id: event.id,
             summary: event.summary,
