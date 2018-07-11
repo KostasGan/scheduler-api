@@ -8,8 +8,6 @@ exports.initDateWithTimezone = (date) => {
 }
 
 exports.formatUnavailableDates = (startDate, endDate) => {
-    console.log(startDate);
-    console.log(endDate);
     let new_startdate = exports.initDateWithTimezone(startDate);
     let new_enddate = exports.initDateWithTimezone(endDate);
     console.log(startDate);
