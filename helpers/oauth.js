@@ -14,7 +14,7 @@ exports.initGoogleAuth = (config) => {
 }
 
 exports.authorizeClient = (oauth2Client) => {
-    let access_token = oauth2Client.credentials.access_token  || '';
+    let access_token = oauth2Client.credentials.access_token || '';
     let options = {
         'url': url,
         'form': {
@@ -32,11 +32,9 @@ exports.authorizeClient = (oauth2Client) => {
                         if (user && user.ac_token !== access_token) {
                             userModel.UpdateUser(data.email, access_token);
                             resolve('validated');
-                        }
-                        else if (user && user.ac_token === access_token) {
+                        } else if (user && user.ac_token === access_token) {
                             resolve('validated');
-                        }
-                        else {
+                        } else {
                             userModel.CreateUser(data.email, access_token).then((val) => {
                                 if (val === 'Failed') {
                                     reject('error');
@@ -49,12 +47,10 @@ exports.authorizeClient = (oauth2Client) => {
                         console.log(e);
                         reject('error');
                     });
-                }
-                else {
+                } else {
                     reject('error');
                 }
-            }
-            else {
+            } else {
                 reject('error');
             }
         });
@@ -76,12 +72,10 @@ exports.checkAuthToken = (oauth2Client) => {
             if (!error && response.statusCode === 400 && data.error_description === 'Invalid Value') {
                 resolve('Invalid Credentials');
                 return;
-            }
-            else if (!error && response.statusCode === 200) {
+            } else if (!error && response.statusCode === 200) {
                 resolve('Valid User');
                 return;
-            }
-            else {
+            } else {
                 reject((JSON.parse(body)).error_description);
                 return;
             }

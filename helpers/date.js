@@ -8,7 +8,9 @@ exports.initDateWithTimezone = (date) => {
 }
 
 exports.formatUnavailableDates = (startDate, endDate) => {
-    return `${moment(startDate).tz(timezone).format('YYYY-MM-DD HH:mm')}-${moment(endDate).tz(timezone).format('HH:mm')}`;
+    let new_startdate = exports.initDateWithTimezone(startDate);
+    let new_enddate = exports.initDateWithTimezone(endDate);
+    return `${new_startdate.format('YYYY-MM-DD HH:mm')}-${new_enddate.format('HH:mm')}`;
 }
 
 exports.isBetwennTwoDates = (date, startRange, endRange) => {
@@ -17,7 +19,7 @@ exports.isBetwennTwoDates = (date, startRange, endRange) => {
 
 exports.formatDateWithTime = (startDate, diffDate, available_time) => {
     let range = [];
-    
+
     for (let i = 0; i <= diffDate; i++) {
         let av_time = available_time[i].trim().split(/[":\-"]/);
         let newISOStartDate = startDate.toISOString();

@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const auth = require('../helpers/oauth');
 const date_helper = require('../helpers/date');
-const ev_controler = require('../controllers/event-scheduler');
+const ev_controler = require('../controllers/event_scheduler');
 const userModel = require('../models/user').Model;
 const join = Promise.join;
 
@@ -69,7 +69,6 @@ exports.registerRoutes = function (app, config) {
             return Promise.each(all_users, (token) => {
                 oauth2Client.credentials = { 'access_token': token.ac_token };
                 return Promise.each(dateRange, (range) => {
-                    console.log(range);
                     return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate)
                         .then((events) => {
                             return ev_controler.searchDateAvailability(events.events, range);

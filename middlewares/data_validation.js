@@ -1,12 +1,11 @@
-const moment = require('moment');
 const Promise = require('bluebird');
-const join = Promise.join;
 const data_helper = require('../helpers/data');
 const date_helper = require('../helpers/date');
+const join = Promise.join;
 
 exports.accessTokenValidation = (req, res, next) => {
     let access_token = req.get('X-Access-Token') ? req.get('X-Access-Token').trim() : '';
-    
+
     if (access_token === '' || access_token.length < 132) {
         res.json({
             status: 'error',
@@ -14,6 +13,7 @@ exports.accessTokenValidation = (req, res, next) => {
         });
         return;
     }
+
     res.locals.access_token = access_token;
     next();
 }

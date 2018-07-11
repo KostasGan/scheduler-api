@@ -9,7 +9,7 @@ exports.send_Email = (config, email_list) => {
     let transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         secure: true,
-        port:465,
+        port: 465,
         auth: {
             user: username,
             pass: password
@@ -20,10 +20,10 @@ exports.send_Email = (config, email_list) => {
         from: username,
         to: email_list,
         subject: 'Invitation to Event-Scheduler',
-        html: '<p> An invitation for a new event schedule sent. We need permission to continue the process. </p><p>To continue, login <a href="' + page_url + '/login.html">here</a></p>' 
+        html: '<p> An invitation for a new event schedule sent. We need permission to continue the process. </p><p>To continue, login <a href="' + page_url + '/login.html">here</a></p>'
     };
-    
-    return new Promise((resolve,reject) =>{
+
+    return new Promise((resolve, reject) => {
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
