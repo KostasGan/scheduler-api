@@ -10,6 +10,7 @@ exports.initDateWithTimezone = (date) => {
 exports.formatUnavailableDates = (startDate, endDate) => {
     let new_startdate = exports.initDateWithTimezone(startDate);
     let new_enddate = exports.initDateWithTimezone(endDate);
+    console.log(`${new_startdate.format('YYYY-MM-DD HH:mm')}-${new_enddate.format('HH:mm')}`);
     return `${new_startdate.format('YYYY-MM-DD HH:mm')}-${new_enddate.format('HH:mm')}`;
 }
 
