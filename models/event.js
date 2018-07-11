@@ -23,13 +23,13 @@ EventListSchema.statics._constructor = (email, events) => {
     return Promise.map(events, (event) => {
         let startDate = date_helper.initDateWithTimezone(event.start.dateTime);
         let endDate = date_helper.initDateWithTimezone(event.end.dateTime);
-
+        
         return {
             event_id: event.id,
             summary: event.summary,
-            startDate: startDate.format('YYYY-MM-DD HH:mm'),
+            startDate: startDate.toISOString(),
             startHour: startDate.hour(),
-            endDate: endDate.format('YYYY-MM-DD HH:mm'),
+            endDate: endDate.toISOString(),
             endHour: endDate.hour()
         };
     }).then((new_events) => {
