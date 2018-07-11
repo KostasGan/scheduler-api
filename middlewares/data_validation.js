@@ -2,6 +2,7 @@ const moment = require('moment');
 const Promise = require('bluebird');
 const join = Promise.join;
 const data_helper = require('../helpers/data');
+const date_helper = require('../helpers/date');
 
 exports.accessTokenValidation = (req, res, next) => {
     let access_token = req.get('X-Access-Token') ? req.get('X-Access-Token').trim() : '';
@@ -19,8 +20,8 @@ exports.accessTokenValidation = (req, res, next) => {
 
 exports.formDataValidation = (req, res, next) => {
     let body = req.body;
-    let startDate = body.event_start ? moment(body.event_start) : '';
-    let endDate = body.event_end ? moment(body.event_end) : '';
+    let startDate = body.event_start ? date_helper.initDateWithTimezone(body.event_start) : '';
+    let endDate = body.event_end ? date_helper.initDateWithTimezone(body.event_end) : '';
     let duration = parseInt(body.event_duration, 10) || 1;
     let available_time = body.available_time ? body.available_time.split(',') : '';
     let attendees = body.attendees || '';
