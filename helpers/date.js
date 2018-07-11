@@ -15,5 +15,6 @@ exports.formatDateWithTime = (startDate, diffDate, available_time) => {
             });
         }
     }
+    console.log(range);
     return Promise.all(range);
 }
