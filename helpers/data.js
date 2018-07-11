@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 
+
 exports.checkValidEmails = (attendees) => {
     var re = /^(([^<>()\[\]\\.:@"]+(\.[^<>()\[\]\\.:@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     let emails = attendees.trim().split(',');
