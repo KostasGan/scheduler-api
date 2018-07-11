@@ -39,9 +39,6 @@ exports.searchDateAvailability = (events, range) => {
         let timezone = 'Europe/Athens';
 
         return Promise.map(events, (event) => {
-            console.log(event.startDate);
-            console.log(event.endDate);
-            console.log(range);
             let isBetweenStartDate = moment(event.startDate).isBetween(range.startDate, range.endDate, null, '[]');
             let isBetweenEndDate = moment(event.endDate).isBetween(range.startDate, range.endDate, null, '[]');
 
