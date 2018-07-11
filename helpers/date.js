@@ -11,11 +11,11 @@ exports.formatDateWithTime = (startDate, diffDate, available_time) => {
         let new_enddate = new moment(newISOStartDate).add(i, 'd');
 
         if (av_time[i] !== '0' && av_time[i + 1] !== '0') {
-            console.log(av_time[0] + " " + av_time[1])
-            console.log(av_time[2] + " " + av_time[3])
+            console.log(new_date.set({ 'hour': av_time[0], 'minutes': av_time[1] }).utc())
+            console.log(new_enddate.set({ 'hour': av_time[2], 'minutes': av_time[3] }).utc())
             range.push({
-                'startDate': (new_date.set({ 'hour': av_time[0], 'minutes': av_time[1] }).utc()).toISOString(),
-                'endDate': (new_enddate.set({ 'hour': av_time[2], 'minutes': av_time[3] }).utc()).toISOString()
+                'startDate': (new_date.set({ 'hour': av_time[0], 'minutes': av_time[1] }).utc()).format(),
+                'endDate': (new_enddate.set({ 'hour': av_time[2], 'minutes': av_time[3] }).utc()).format()
             });
         }
     }
