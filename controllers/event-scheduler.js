@@ -41,12 +41,10 @@ exports.searchDateAvailability = (events, range) => {
         return Promise.map(events, (event) => {
             console.log(event.startDate);
             console.log(event.endDate);
-
+            console.log(range);
             let isBetweenStartDate = moment(event.startDate).isBetween(range.startDate, range.endDate, null, '[]');
             let isBetweenEndDate = moment(event.endDate).isBetween(range.startDate, range.endDate, null, '[]');
 
-            console.log(isBetweenStartDate);
-            console.log(isBetweenEndDate);
             if (isBetweenStartDate && isBetweenEndDate) {
                 // console.log(`${moment(event.startDate).format('YYYY-MM-DD HH:mm')}-${moment(event.endDate).format('HH:mm')}`);
                 return `${moment(event.startDate).tz(timezone).format('YYYY-MM-DD HH:mm')}-${moment(event.endDate).tz(timezone).format('HH:mm')}`;
