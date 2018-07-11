@@ -14,8 +14,8 @@ exports.formatDateWithTime = (startDate, diffDate, available_time) => {
             new_date.set({ 'hour': av_time[0], 'minutes': av_time[1] });
             new_enddate.set({ 'hour': av_time[2], 'minutes': av_time[3] })
             range.push({
-                'startDate': new_date.tz(timezone).format(),
-                'endDate': new_enddate.tz(timezone).format()
+                'startDate': new_date.toISOString(),
+                'endDate': new_enddate.toISOString()
             });
         }
     }
