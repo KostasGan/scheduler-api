@@ -10,12 +10,11 @@ exports.initDateWithTimezone = (date) => {
 exports.formatUnavailableDates = (startDate, endDate) => {
     let new_startdate = exports.initDateWithTimezone(startDate);
     let new_enddate = exports.initDateWithTimezone(endDate);
-    
+
     return `${new_startdate.format('YYYY-MM-DD HH:mm')}-${new_enddate.format('HH:mm')}`;
 }
 
 exports.isBetwennTwoDates = (date, startRange, endRange) => {
-    console.log(moment(date).isBetween(startRange, endRange, null, '[]'));
     return moment(date).isBetween(startRange, endRange, null, '[]');
 }
 

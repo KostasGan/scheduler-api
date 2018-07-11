@@ -37,8 +37,6 @@ exports.searchDateAvailability = (events, range) => {
     }
     else if (events.length > 0) {
         return Promise.map(events, (event) => {
-            console.log(event);
-            console.log(range);
             let isBetweenStartDate = date_helper.isBetwennTwoDates(event.startDate, range.startDate, range.endDate);
             let isBetweenEndDate = date_helper.isBetwennTwoDates(event.endDate, range.startDate, range.endDate);
 
