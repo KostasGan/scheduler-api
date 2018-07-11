@@ -2,6 +2,7 @@ const express = require('express');
 const config = require('config');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const data_validation = require('./middlewares/data_validation');
 
 let app = express();
 
@@ -9,10 +10,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
 
-app.use((req, res, next) => {
-    res.locals.access_token = req.get('X-Access-Token') ? req.get('X-Access-Token').trim() : '';
-    next();
-});
+app.use(data_validation.accessTokenValidation);
+app.use('/api/events/scheduler', data_validation.formDataValidation);
 
 let routes = require('./routes/initRoutes.js');
 

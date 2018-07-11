@@ -15,11 +15,3 @@ mongoose.connect(uri, {
 });
 
 exports.mongoose = mongoose;
-
-// exports.connect = (() => {
-//     mongoose.connect();
-// });
-
-// exports.close = (() => {
-//     mongoose.disconnect();
-// })

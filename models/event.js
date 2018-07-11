@@ -1,6 +1,6 @@
 const db = require('../helpers/db');
 const Promise = require('bluebird');
-const moment = require('moment');
+const date_helper = require('../helpers/date');
 const Schema = db.mongoose.Schema;
 
 let event;
@@ -21,8 +21,8 @@ const EventListSchema = new Schema({
 
 EventListSchema.statics._constructor = (email, events) => {
     return Promise.map(events, (event) => {
-        let startDate = moment(event.start.dateTime);
-        let endDate = moment(event.end.dateTime);
+        let startDate = date_helper.initDateWithTimezone(event.start.dateTime);
+        let endDate = date_helper.initDateWithTimezone(event.end.dateTime);
 
         return {
             event_id: event.id,

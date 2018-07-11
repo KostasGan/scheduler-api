@@ -4,14 +4,6 @@ exports.registerRoutes = function (app, config) {
     app.post('/api/user/auth', (req, res) => {
         let access_token = res.locals.access_token;
 
-        if (access_token === '') {
-            res.json({
-                status: 'error',
-                message: 'Bad Request. Some variables missing. Please try again!'
-            });
-            return;
-        }
-
         let oauth2Client = auth.initGoogleAuth(config);
         oauth2Client.credentials = { 'access_token': access_token };
 
