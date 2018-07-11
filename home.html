@@ -236,6 +236,7 @@
                                 api + '/api/user/invite', true);
                             xhr.timeout = 15000; // time in milliseconds
                             xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                            xhr.setRequestHeader('X-Access-Token', access_token);
                             xhr.onreadystatechange = function () {
                                 if (xhr.readyState == 4 && xhr.status == 200) {
                                     response = JSON.parse(xhr.response);
