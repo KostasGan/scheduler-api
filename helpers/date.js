@@ -27,7 +27,7 @@ exports.formatDateWithTime = (startDate, diffDate, available_time) => {
         let new_date = exports.initDateWithTimezone(newISOStartDate);
         let new_enddate = exports.initDateWithTimezone(newISOStartDate);
 
-        if (av_time[i] !== '0' && av_time[i + 1] !== '0') {
+        if (av_time[0] !== '0' && av_time[1] !== '0') {
             new_date.add(i, 'd').set({ 'hour': av_time[0], 'minutes': av_time[1] });
             new_enddate.add(i, 'd').set({ 'hour': av_time[2], 'minutes': av_time[3] });
 
@@ -38,4 +38,19 @@ exports.formatDateWithTime = (startDate, diffDate, available_time) => {
         }
     }
     return Promise.all(range);
+}
+
+exports.getRandomDate = (start, end) => {
+    let min  = moment(start).hour();
+    let max = moment(end).hour();
+
+    let randomTime = Math.floor(Math.random() * (max - min)) + min;
+    let newStart = new moment(start).tz(timezone).set({ 'hour': randomTime });
+    let newEnd = new moment(newStart).tz(timezone).set({ 'minutes': 15 });
+    // let new_date = `${newStart.format('YYYY-MM-DD HH:mm')}-${newEnd.format('HH:mm')}`
+
+    return {
+        startDate: newStart.toISOString(),
+        endDate: newEnd.toISOString()
+    }
 }
