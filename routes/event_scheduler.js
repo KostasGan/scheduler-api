@@ -9,7 +9,6 @@ exports.registerRoutes = function (app, config) {
     app.post('/api/events/scheduler', (req, res) => {
         let body = res.locals.data;
         let startDate = body.event_start; 
-        let endDate = body.event_end;
         let diffDate = body.diffDate;
         let duration = body.event_duration;
         let available_time = body.available_time;
@@ -63,42 +62,49 @@ exports.registerRoutes = function (app, config) {
         .then((all_users) => {
             if(!all_users || all_users.length === 0) return;
 
-            let unavailable_dates = [];
+            let suggestedDates = [];
             let dateRange = date_helper.formatDateWithTime(startDate, diffDate, available_time);
 
-            return Promise.each(all_users, (token) => {
-                oauth2Client.credentials = { 'access_token': token.ac_token };
-                return Promise.each(dateRange, (range) => {
+            return Promise.each(dateRange, (range, index) => {
+                return Promise.each(all_users, (token) => {
+                    oauth2Client.credentials = { 'access_token': token.ac_token };
+
                     return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate)
                         .then((events) => {
-                            return ev_controler.searchDateAvailability(events.events, range);
+                            return ev_controler.searchDateAvailability(events.events, range, duration);
                         })
-                        .each((dt) => {
-                            if (!unavailable_dates.includes(dt)) {
-                                unavailable_dates.push(dt);
+                        .then((dt) => {
+                            if (!dt) return;
+
+                            if (suggestedDates.length === index ){
+                                let suggested = date_helper.formatSuggestedDates(dt.startDate, dt.endDate);
+                                suggestedDates.push(suggested);
                             }
+                            
                         });
                 });
             })
             .then(() => {
-                return new Promise.all(unavailable_dates);
-            })
+                return new Promise.all(suggestedDates);
+            });
         })
-        .then((unavailable_dates) => {
-            if(!unavailable_dates) return;
+        .then((suggested_dates) => {
+            if(!suggested_dates) Promise.reject();
 
-            if (unavailable_dates.length === 0) {
+            if (suggested_dates.length > 0) {
                 res.json({
                     status: 'success',
-                    message: 'Available Date',
-                    data: unavailable_dates
+                    message: 'Suggested Dates',
+                    data: suggested_dates
                 });
+                return;
             } else {
                 res.json({
                     status: 'success',
-                    message: 'Unavailable Date',
-                    data: unavailable_dates
+                    message: 'Unavailable Dates',
+                    data: suggested_dates
                 });
+                return;
             }
         }).catch((e) => {
             console.log(e);

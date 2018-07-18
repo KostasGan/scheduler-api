@@ -7,14 +7,14 @@ exports.initDateWithTimezone = (date) => {
     return new moment(date).tz(timezone);
 }
 
-exports.formatUnavailableDates = (startDate, endDate) => {
+exports.formatSuggestedDates = (startDate, endDate) => {
     let new_startdate = exports.initDateWithTimezone(startDate);
     let new_enddate = exports.initDateWithTimezone(endDate);
 
     return `${new_startdate.format('YYYY-MM-DD HH:mm')}-${new_enddate.format('HH:mm')}`;
 }
 
-exports.isBetwennTwoDates = (date, startRange, endRange) => {
+exports.isBetweenTwoDates = (date, startRange, endRange) => {
     return moment(date).isBetween(startRange, endRange, null, '[]');
 }
 
@@ -40,14 +40,13 @@ exports.formatDateWithTime = (startDate, diffDate, available_time) => {
     return Promise.all(range);
 }
 
-exports.getRandomDate = (start, end) => {
+exports.createSuggestedDate = (start, end, duration) => {
     let min  = moment(start).hour();
     let max = moment(end).hour();
 
     let randomTime = Math.floor(Math.random() * (max - min)) + min;
     let newStart = new moment(start).tz(timezone).set({ 'hour': randomTime });
-    let newEnd = new moment(newStart).tz(timezone).set({ 'minutes': 15 });
-    // let new_date = `${newStart.format('YYYY-MM-DD HH:mm')}-${newEnd.format('HH:mm')}`
+    let newEnd = new moment(newStart).tz(timezone).set({ 'minutes': duration });
 
     return {
         startDate: newStart.toISOString(),

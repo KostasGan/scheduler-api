@@ -205,7 +205,7 @@
                         document.getElementById('resp_msg').innerHTML = response.message;
                     }
                     else if (response.data.length > 0) {
-                        let message = 'Dates are available except:\n';
+                        let message = 'Suggested Dates are:\n';
 
                         response.data.forEach(function (dates) {
                             message = message + '<li >' + dates + '</li>';

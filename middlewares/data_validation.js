@@ -5,7 +5,7 @@ const join = Promise.join;
 
 exports.accessTokenValidation = (req, res, next) => {
     let access_token = req.get('X-Access-Token') ? req.get('X-Access-Token').trim() : '';
-    console.log(access_token.length);
+
     if (access_token === '' || access_token.length < 130) {
         res.json({
             status: 'error',
@@ -22,7 +22,7 @@ exports.formDataValidation = (req, res, next) => {
     let body = req.body;
     let startDate = body.event_start ? date_helper.initDateWithTimezone(body.event_start) : '';
     let endDate = body.event_end ? date_helper.initDateWithTimezone(body.event_end) : '';
-    let duration = parseInt(body.event_duration, 10) || 1;
+    let duration = parseInt(body.event_duration, 10) || 60;
     let available_time = body.available_time ? body.available_time.split(',') : '';
     let attendees = body.attendees || '';
 

@@ -9,9 +9,7 @@ const EventSchema = new Schema({
     event_id: { type: String, required: true },
     summary: { type: String, required: true },
     startDate: { type: Date, required: true },
-    startHour: { type: Number, required: true },
-    endDate: { type: Date, required: true },
-    endDateHour: { type: Number, required: true }
+    endDate: { type: Date, required: true }
 });
 
 const EventListSchema = new Schema({
@@ -28,9 +26,7 @@ EventListSchema.statics._constructor = (email, events) => {
             event_id: event.id,
             summary: event.summary,
             startDate: startDate.toISOString(),
-            startHour: startDate.hour(),
-            endDate: endDate.toISOString(),
-            endHour: endDate.hour()
+            endDate: endDate.toISOString()
         };
     }).then((new_events) => {
         return new event({

@@ -2,7 +2,6 @@ const google = require('googleapis');
 const Promise = require('bluebird');
 const event = require('../models/event').Model;
 const date_helper = require('../helpers/date');
-
 let calendar = google.calendar('v3');
 
 exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
@@ -16,36 +15,49 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
             orderBy: 'startTime'
         }, function (err, response) {
             if (err) {
-                // console.log('The API returned an error: ' + err.message);
-                return reject({
-                    'status': 'error',
-                    'message': err.message
-                });
+                return reject(err);
             }
             let events = response.items || [];
 
-            event._constructor(response.summary, events).then((new_events) => {
-                return resolve(new_events);
-            });
+            event._constructor(response.summary, events)
+                .then((new_events) => {
+                    return resolve(new_events);
+                });
         });
     });
 }
 
-exports.searchDateAvailability = (events, range) => {
+exports.searchDateAvailability = (events, range, duration) => {
     if (events.length === 0) {
-        return Promise.resolve([]);
-    }
-    else if (events.length > 0) {
-        return Promise.map(events, (event) => {
-            let isBetweenStartDate = date_helper.isBetwennTwoDates(event.startDate, range.startDate, range.endDate);
-            let isBetweenEndDate = date_helper.isBetwennTwoDates(event.endDate, range.startDate, range.endDate);
+        let new_date = date_helper.createSuggestedDate(range.startDate, range.endDate, duration);
 
-            if (isBetweenStartDate && isBetweenEndDate) {
-                return date_helper.formatUnavailableDates(event.startDate, event.endDate);
-            }
-            else {
-                return date_helper.formatUnavailableDates(range.startDate, range.endDate);
-            }
-        });
+        return Promise.resolve(new_date);
+    } else if (events.length > 0) {
+        let new_date;
+        let i = 0;
+        let availability = false;
+
+        do {
+            new_date = date_helper.createSuggestedDate(range.startDate, range.endDate, duration);
+
+            events.forEach((event) => {
+                let newDateStartisBetweenEventStart = date_helper.isBetweenTwoDates(new_date.startDate, event.startDate, event.endDate);
+                let newDateEndisBetweenEventEnd = date_helper.isBetweenTwoDates(new_date.endDate, event.startDate, event.endDate);
+                let EventStartIsBetweenNewDate = date_helper.isBetweenTwoDates(event.startDate, new_date.startDate, new_date.endDate);
+                let EventEndIsBetweenNewDate = date_helper.isBetweenTwoDates(event.endDate, new_date.startDate, new_date.endDate);
+                let newDateIsInRangeDates = date_helper.isBetweenTwoDates(new_date.endDate, range.startDate, range.endDate);
+
+                if ((!newDateStartisBetweenEventStart || !newDateEndisBetweenEventEnd) && (!EventStartIsBetweenNewDate || !EventEndIsBetweenNewDate) && (newDateIsInRangeDates)) {
+                    availability = true;
+                    return;
+                }
+
+                i++;
+                return;
+            });
+        }
+        while (!availability && i < 3);
+
+        return Promise.resolve(new_date);
     }
 }
