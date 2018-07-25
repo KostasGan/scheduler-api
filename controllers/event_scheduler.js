@@ -17,6 +17,7 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
             if (err) {
                 return reject(err);
             }
+            
             let events = response.items || [];
 
             event._constructor(response.summary, events)
@@ -34,10 +35,10 @@ exports.searchDateAvailability = (events, range, duration) => {
         return Promise.resolve(new_date);
     } else if (events.length > 0) {
         let new_date;
-        let i = 0;
-        let availability = false;
+        let availability = true;
 
         do {
+            let no_available = 0;
             new_date = date_helper.createSuggestedDate(range.startDate, range.endDate, duration);
 
             events.forEach((event) => {
@@ -45,18 +46,24 @@ exports.searchDateAvailability = (events, range, duration) => {
                 let newDateEndisBetweenEventEnd = date_helper.isBetweenTwoDates(new_date.endDate, event.startDate, event.endDate);
                 let EventStartIsBetweenNewDate = date_helper.isBetweenTwoDates(event.startDate, new_date.startDate, new_date.endDate);
                 let EventEndIsBetweenNewDate = date_helper.isBetweenTwoDates(event.endDate, new_date.startDate, new_date.endDate);
-                let newDateIsInRangeDates = date_helper.isBetweenTwoDates(new_date.endDate, range.startDate, range.endDate);
 
-                if ((!newDateStartisBetweenEventStart || !newDateEndisBetweenEventEnd) && (!EventStartIsBetweenNewDate || !EventEndIsBetweenNewDate) && (newDateIsInRangeDates)) {
-                    availability = true;
+                if (!((!newDateStartisBetweenEventStart || !newDateEndisBetweenEventEnd) && (!EventStartIsBetweenNewDate || !EventEndIsBetweenNewDate))) {
+                    no_available++;
                     return;
                 }
-
-                i++;
                 return;
             });
+
+            let newDateIsInRangeDates = date_helper.isBetweenTwoDates(new_date.endDate, range.startDate, range.endDate);
+
+            if (no_available > 0 || !newDateIsInRangeDates){
+                availability = false;
+            } else {
+                availability = true;
+            }
+
         }
-        while (!availability && i < 3);
+        while (!availability);
 
         return Promise.resolve(new_date);
     }

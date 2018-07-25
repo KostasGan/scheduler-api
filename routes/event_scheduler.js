@@ -65,22 +65,29 @@ exports.registerRoutes = function (app, config) {
             let suggestedDates = [];
             let dateRange = date_helper.formatDateWithTime(startDate, diffDate, available_time);
 
-            return Promise.each(dateRange, (range, index) => {
+            return Promise.each(dateRange, (range) => {
+                let all_events = [];
+                
                 return Promise.each(all_users, (token) => {
                     oauth2Client.credentials = { 'access_token': token.ac_token };
 
                     return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate)
                         .then((events) => {
-                            return ev_controler.searchDateAvailability(events.events, range, duration);
+                            events.events.forEach((events) => {
+                                all_events.push(events);
+                            });
+                        });
+                })
+                .then(() => {
+                    Promise.all(all_events)
+                        .then((events) => {
+                            return ev_controler.searchDateAvailability(events, range, duration);
                         })
                         .then((dt) => {
                             if (!dt) return;
-
-                            if (suggestedDates.length === index ){
-                                let suggested = date_helper.formatSuggestedDates(dt.startDate, dt.endDate);
-                                suggestedDates.push(suggested);
-                            }
                             
+                            let suggested = date_helper.formatSuggestedDates(dt.startDate, dt.endDate);
+                            suggestedDates.push(suggested);
                         });
                 });
             })
@@ -89,7 +96,7 @@ exports.registerRoutes = function (app, config) {
             });
         })
         .then((suggested_dates) => {
-            if(!suggested_dates) Promise.reject();
+            if(!suggested_dates) return;
 
             if (suggested_dates.length > 0) {
                 res.json({
