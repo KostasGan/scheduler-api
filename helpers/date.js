@@ -6,12 +6,15 @@ let timezone = 'Europe/Athens';
 exports.initDateWithTimezone = (date) => {
     return new moment(date).tz(timezone);
 }
+exports.initDateWithTimezoneFormat = (date, format) => {
+    return new moment(date).tz(timezone).format(format);
+}
 
 exports.formatSuggestedDates = (startDate, endDate) => {
-    let new_startdate = exports.initDateWithTimezone(startDate);
-    let new_enddate = exports.initDateWithTimezone(endDate);
+    let new_startdate = exports.initDateWithTimezoneFormat(startDate, 'YYYY-MM-DD HH:mm');
+    let new_enddate = exports.initDateWithTimezoneFormat(endDate, 'HH:mm');
 
-    return `${new_startdate.format('YYYY-MM-DD HH:mm')}-${new_enddate.format('HH:mm')}`;
+    return `${new_startdate}-${new_enddate}`;
 }
 
 exports.isBetweenTwoDates = (date, startRange, endRange) => {
