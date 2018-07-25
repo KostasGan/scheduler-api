@@ -44,12 +44,12 @@ exports.formatDateWithTime = (startDate, diffDate, available_time) => {
 }
 
 exports.createSuggestedDate = (start, end, duration) => {
-    let min  = moment(start).hour();
-    let max = moment(end).hour();
+    let min = exports.initDateWithTimezone(start).hour();
+    let max = exports.initDateWithTimezone(end).hour();
 
     let randomTime = Math.floor(Math.random() * (max - min)) + min;
-    let newStart = new moment(start).tz(timezone).set({ 'hour': randomTime });
-    let newEnd = new moment(newStart).tz(timezone).set({ 'minutes': duration });
+    let newStart = exports.initDateWithTimezone(start).set({ 'hour': randomTime });
+    let newEnd = exports.initDateWithTimezone(newStart).set({ 'minutes': duration });
 
     return {
         startDate: newStart.toISOString(),
