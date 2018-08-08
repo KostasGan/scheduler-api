@@ -11,12 +11,10 @@
         crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <!-- <link rel="stylesheet" type="text/css" href="/jquery-timepicker/jquery.timepicker.min.css" /> -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <!-- <script type="text/javascript" src="/jquery-timepicker/jquery.timepicker.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <style>
@@ -150,6 +148,9 @@
         select{
             padding: 0px;
             margin-right: 5px;
+        }
+        .popover button{
+            margin: auto 5px;
         }
     </style>
     <script>
@@ -361,13 +362,21 @@
         <script>
             let event_start;
             let event_end;
-            let select = '';
+            let selectHour = '<option></option>';
+            let selectMin = '<option></option>';
             (function () {
-                for (i = 0; i <= 24 ; i++){;
+                for (i = 0; i < 24 ; i++){;
                     if (i < 10){
-                       select = select + "<option value='"+ i +"'>0"+ i + '</option>'
+                        selectHour = selectHour + "<option class='select' value='"+ i +"'>0"+ i + '</option>'
                     } else {
-                        select = select + "<option value='"+ i +"'>"+ i + '</option>'
+                        selectHour = selectHour + "<option class='select' value='"+ i +"'>"+ i + '</option>'
+                    }
+                }
+                for(i=0; i < 60; i+=5){
+                    if (i < 10){
+                        selectMin = selectMin + "<option value='"+ i +"'>0"+ i + '</option>'
+                    } else {
+                        selectMin = selectMin + "<option value='"+ i +"'>"+ i + '</option>'
                     }
                 }
             })()
@@ -375,10 +384,10 @@
             $('#available_time').popover({
                 'title': 'Select availability time!',
                 "html": true,
-                'content': "<div class='row selectAvailability'> <b style='margin:auto' class='col'>From</b> <select id='startHour' class='col'>" + select + "</select> <select id='startMin' class='col'>" + select + "</select> </div>" + 
-                            "<div class='row selectAvailability'> <p style='margin:auto' class='col'> <b>To</b></p> <select id='endHour' class='col'>" + select + "</select> <select id='endMin' class='col'>" + select + "</select></div>" + 
+                'content': "<div class='row selectAvailability'> <b style='margin:auto' class='col'>From</b> <select id='startHour' class='col custom-select'>" + selectHour + "</select> <select id='startMin' class='col custom-select'>" + selectMin + "</select> </div>" + 
+                            "<div class='row selectAvailability'> <p style='margin:auto' class='col'> <b>To</b></p> <select id='endHour' class='col custom-select'>" + selectHour + "</select> <select id='endMin' class='col custom-select'>" + selectMin + "</select></div>" + 
                             "<div class='row selectAvailability' style= 'margin: auto 0'> <b><p> or </p></b></div>" +
-                            "<div class='row selectAvailability' id='free_day'><button id='free_day'> Free Day </button></div>",
+                            "<div class='row selectAvailability'><button class='btn col' id='free_day'> Free Day </button> <button class='btn col' id='clear'>Clear</button></div>",
                 'placement': 'bottom'
             });
 
@@ -394,13 +403,16 @@
                 event_end = end.format('YYYY-MM-DD');
             });
 
-            $('input:not(#available_time)').on('click',function() {
+            $('input:not(#available_time)').on('click', function() {
+                $('#available_time').popover('hide');
+            });
+            $('button:not(#available_time)').on('click', function() {
                 $('#available_time').popover('hide');
             });
 
             $('#available_time').on('shown.bs.popover', function(event) {
                $('#startHour').on('change', function (event) {
-                    let disabledOptions = $('#end option:disabled');
+                    let disabledOptions = $('#endHour option:disabled');
 
                     if (disabledOptions.length > 0 ) {
                         for(i = 0 ; i <= disabledOptions.length; i++){
@@ -410,7 +422,7 @@
 
                     let val = parseInt($('#startHour option:selected').val());
 
-                    if (val !== 24){
+                    if (val !== 23){
                         for (i = 0; i <= val+1; i++) {
                             $('#endHour option:nth-child(' + i + ')').prop('disabled', true);
                         }
@@ -432,29 +444,39 @@
                     $('#available_time').popover('hide');
                 });
 
-                $('#endMin').on('change', function (event) {
+                $('#clear').on('click', function(event) {
+                    $('#available_time').val('');
+                    $('#available_time').popover('hide');
+                });
+
+                $('select').on('blur', function (event) {
                     let startVal = $('#startHour option:selected').text();
                     let startMinVal = $('#startMin option:selected').text();
                     let endVal = $('#endHour option:selected').text();
                     let endMinVal = $('#endMin option:selected').text();
-                    console.log(startVal)
+                    var newVal = '';
 
-                    if (startVal !== '' && endVal !== '') {
-                        // $('#available_time').popover('hide');
+                    if (startVal !== '' && startMinVal !== '' && endVal !== '' && endMinVal !== '') {
+                        let availability = $('#available_time');
+                        let availabilityText = availability.val()
 
-                        let availability = $('#available_time').val();
-
-                        if (availability !== '') {
-                            let newVal = availability + ',' + startVal.trim() + ':' + startMinVal.tri() + '-' + endVal.trim() + ':' + endMinVal.trim();
-                            $('#available_time').val(newVal)
+                        if (availabilityText.indexOf('00:00-00:00') > -1) {
+                            availabilityText.replace('00:00-00:00', '');
+                            availability.val(availabilityText);
+                        } else if (availabilityText !== '' ){
+                            newVal = availabilityText + ',' + startVal.trim() + ':' + startMinVal.trim() + '-' + endVal.trim() + ':' + endMinVal.trim();
                         } else {
-                            let newVal = startVal.trim() + ':' + startMinVal.trim() + '-' + endVal.trim() + ':' + endMinVal.trim();
-                            $('#available_time').val(newVal);
+                            newVal = startVal.trim() + ':' + startMinVal.trim() + '-' + endVal.trim() + ':' + endMinVal.trim();
                         }
+
+                        if(newVal.indexOf('00:00-00:00') < 0 ){
+                            availability.val(newVal);
+                        }
+                        $('#available_time').popover('hide');
                     }
                 });
             });
-           
+
             document.getElementById('form1').addEventListener('submit', function (event) {
                 event.preventDefault();
                 
@@ -463,7 +485,6 @@
 
                 checkAvailableTime(available_time);
                 checkValidEmails(attendees);
-
 
                 if (document.getElementsByClassName('error').length > 0) {
                     return;
