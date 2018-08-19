@@ -68,31 +68,3 @@ exports.searchDateAvailability = (events, range, duration) => {
         return Promise.resolve(new_date);
     }
 }
-
-exports.findAvailableSlots = (events, timeslots) => {
-    if (events.length > 0 && timeslots.length > 0) {
-        let indexes = [];
-        
-        timeslots.forEach((slot, index) => {
-            events.forEach((event) => {
-                let newDateStartisBetweenEventStart = date_helper.isBetweenTwoDates(slot.startDate, event.startDate, event.endDate);
-                let newDateEndisBetweenEventEnd = date_helper.isBetweenTwoDates(slot.endDate, event.startDate, event.endDate);
-
-                if ((newDateStartisBetweenEventStart && newDateEndisBetweenEventEnd) && indexes.indexOf(index) === -1) {
-                    indexes.push(index);
-                }
-                return;
-            });
-        });
-
-        return Promise.all(indexes).then((index) => {
-            for (i = index.length; i > 0; i--) {
-                timeslots.splice(index[i - 1], 1);
-            }
-        }).then(() => {
-            return new Promise.resolve(timeslots);
-        })
-    } else if (events.length === 0) {
-        return new Promise.resolve(timeslots);
-    }
-}
