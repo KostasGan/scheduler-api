@@ -5,6 +5,9 @@ const Schema = db.mongoose.Schema;
 
 let event;
 
+/**
+ * Create a new Moongose Schema
+ */
 const EventSchema = new Schema({
     event_id: { type: String, required: true },
     summary: { type: String, required: true },
@@ -17,6 +20,12 @@ const EventListSchema = new Schema({
     events: { type: [EventSchema], required: true }
 });
 
+/**
+ * Create an new EventObject of events with necessary infos
+ * @param {String} email 
+ * @param {Object} events
+ * @returns {Event}
+ */
 EventListSchema.statics._constructor = (email, events) => {
     return Promise.map(events, (event) => {
         let startDate = date_helper.initDateWithTimezone(event.start.dateTime);

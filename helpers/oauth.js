@@ -5,6 +5,11 @@ const userModel = require('../models/user').Model;
 
 let url = 'https://www.googleapis.com/oauth2/v2/tokeninfo';
 
+/**
+ * Init a googleOauth2Client Object for Google API.
+ * @param {Oject} config 
+ * @returns {Object}
+ */
 exports.initGoogleAuth = (config) => {
     let credentials = config.get('web');
     let auth = new googleAuth();
@@ -13,6 +18,11 @@ exports.initGoogleAuth = (config) => {
     return googleOauth2Client;
 }
 
+/**
+ * Make a request to GoogleTokenInfo to validate access_token. Then update user's propeprty or create new User
+ * @param {Object} oauth2Client
+ * @returns {String}
+ */
 exports.authorizeClient = (oauth2Client) => {
     let access_token = oauth2Client.credentials.access_token || '';
     let options = {
@@ -39,11 +49,11 @@ exports.authorizeClient = (oauth2Client) => {
                                 if (val === 'Failed') {
                                     reject('error');
                                 }
-
                                 resolve('validated');
                             });
                         }
-                    }).catch((e) => {
+                    })
+                    .catch((e) => {
                         console.log(e);
                         reject('error');
                     });
@@ -57,6 +67,11 @@ exports.authorizeClient = (oauth2Client) => {
     });
 }
 
+/**
+ * Make a request to GoogleTokenInfo to validate access_token.
+ * @param {Object} oauth2Client
+ * @returns {String}
+ */
 exports.checkAuthToken = (oauth2Client) => {
     let access_token = oauth2Client.credentials.access_token || '';
     let options = {

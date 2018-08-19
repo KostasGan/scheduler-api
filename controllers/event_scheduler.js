@@ -4,6 +4,13 @@ const event = require('../models/event').Model;
 const date_helper = require('../helpers/date');
 let calendar = google.calendar('v3');
 
+/**
+ * Get all user's events from Google Calendar API
+ * @param {Object} oauth2Client 
+ * @param {String} startDate 
+ * @param {String} endDate 
+ * @returns {Array}
+ */
 exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
     return new Promise((resolve, reject) => {
         calendar.events.list({
@@ -28,57 +35,24 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
     });
 }
 
-exports.searchDateAvailability = (events, range, duration) => {
-    if (events.length === 0) {
-        let new_date = date_helper.createSuggestedDate(range.startDate, range.endDate, duration);
-
-        return Promise.resolve(new_date);
-    } else if (events.length > 0) {
-        let new_date;
-        let availability = true;
-
-        do {
-            let no_available = 0;
-            new_date = date_helper.createSuggestedDate(range.startDate, range.endDate, duration);
-
-            events.forEach((event) => {
-                let newDateStartisBetweenEventStart = date_helper.isBetweenTwoDates(new_date.startDate, event.startDate, event.endDate);
-                let newDateEndisBetweenEventEnd = date_helper.isBetweenTwoDates(new_date.endDate, event.startDate, event.endDate);
-                let EventStartIsBetweenNewDate = date_helper.isBetweenTwoDates(event.startDate, new_date.startDate, new_date.endDate);
-                let EventEndIsBetweenNewDate = date_helper.isBetweenTwoDates(event.endDate, new_date.startDate, new_date.endDate);
-
-                if (!((!newDateStartisBetweenEventStart || !newDateEndisBetweenEventEnd) && (!EventStartIsBetweenNewDate || !EventEndIsBetweenNewDate))) {
-                    no_available++;
-                    return;
-                }
-                return;
-            });
-
-            let newDateIsInRangeDates = date_helper.isBetweenTwoDates(new_date.endDate, range.startDate, range.endDate);
-
-            if (no_available > 0 || !newDateIsInRangeDates){
-                availability = false;
-            } else {
-                availability = true;
-            }
-
-        }
-        while (!availability);
-
-        return Promise.resolve(new_date);
-    }
-}
-
+/**
+ * Check events and time slots to find the available time slots
+ * @param {Array} events 
+ * @param {Array} timeslots 
+ * @returns {Array}
+ */
 exports.findAvailableSlots = (events, timeslots) => {
     if (events.length > 0 && timeslots.length > 0) {
         let indexes = [];
-        
+
         timeslots.forEach((slot, index) => {
             events.forEach((event) => {
                 let newDateStartisBetweenEventStart = date_helper.isBetweenTwoDates(slot.startDate, event.startDate, event.endDate);
                 let newDateEndisBetweenEventEnd = date_helper.isBetweenTwoDates(slot.endDate, event.startDate, event.endDate);
+                let EventStartIsBetweenNewDate = date_helper.isBetweenTwoDates(event.startDate, slot.startDate, slot.endDate);
+                let EventEndIsBetweenNewDate = date_helper.isBetweenTwoDates(event.endDate, slot.startDate, slot.endDate);
 
-                if ((newDateStartisBetweenEventStart && newDateEndisBetweenEventEnd) && indexes.indexOf(index) === -1) {
+                if (((newDateStartisBetweenEventStart && newDateEndisBetweenEventEnd) || (EventStartIsBetweenNewDate && EventEndIsBetweenNewDate)) && indexes.indexOf(index) === -1) {
                     indexes.push(index);
                 }
                 return;
@@ -86,6 +60,7 @@ exports.findAvailableSlots = (events, timeslots) => {
         });
 
         return Promise.all(indexes).then((index) => {
+            console.log(indexes);
             for (i = index.length; i > 0; i--) {
                 timeslots.splice(index[i - 1], 1);
             }

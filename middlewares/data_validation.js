@@ -3,6 +3,12 @@ const data_helper = require('../helpers/data');
 const date_helper = require('../helpers/date');
 const join = Promise.join;
 
+/**
+ * Validate that access_token exist in all API Requests and save it to res.local.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.accessTokenValidation = (req, res, next) => {
     let access_token = req.get('X-Access-Token') ? req.get('X-Access-Token').trim() : '';
 
@@ -18,6 +24,12 @@ exports.accessTokenValidation = (req, res, next) => {
     next();
 }
 
+/**
+ * Validate that user's data are valid, not empty and save them to res.local
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.formDataValidation = (req, res, next) => {
     let body = req.body;
     let startDate = body.event_start ? date_helper.initDateWithTimezone(body.event_start) : '';

@@ -2,15 +2,21 @@ const config = require('config');
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 
+/**
+ * Create a connection to MongoDB
+ */
 let uri = config.get('db.host') + ':' + config.get('db.port') + '/' + config.get('db.db_name');
+
 mongoose.connect(uri, { 
     autoReconnect: true,
     reconnectTries: 5,
     reconnectInterval: 500,
     useMongoClient: true
-}).then(() => {
+})
+.then(() => {
     console.log('Connection to MongoDB established!');
-}).catch((e) => {
+})
+.catch((e) => {
     console.log('Problem with the connection \n' + e);
 });
 

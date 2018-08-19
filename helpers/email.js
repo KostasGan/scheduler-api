@@ -1,6 +1,12 @@
 const Promise = require('bluebird');
 const nodemailer = require('nodemailer');
 
+/**
+ * Create an new SMTP Connection and send Invitation Email to unauthorized users.
+ * @param {Object} config 
+ * @param {String} email_list
+ * @returns {String}
+ */
 exports.send_Email = (config, email_list) => {
     let username = config.get('email.username');
     let password = config.get('email.password');

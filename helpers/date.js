@@ -3,13 +3,31 @@ const moment = require('moment-timezone');
 
 let timezone = 'Europe/Athens';
 
+/**
+ * Init a new moment date with timezone
+ * @param {String} date
+ * @returns {String}
+ */
 exports.initDateWithTimezone = (date) => {
     return new moment(date).tz(timezone);
 }
+
+/**
+ * Init a new moment date using timezone and a certain format
+ * @param {String} date 
+ * @param {String} format 
+ * @returns {String}
+ */
 exports.initDateWithTimezoneFormat = (date, format) => {
     return new moment(date).tz(timezone).format(format);
 }
 
+/**
+ * Format suggested Date eg 2018-12-12 12:00-13:00
+ * @param {String} startDate 
+ * @param {String} endDate
+ * @returns {String}
+ */
 exports.formatSuggestedDates = (startDate, endDate) => {
     let new_startdate = exports.initDateWithTimezoneFormat(startDate, 'YYYY-MM-DD HH:mm');
     let new_enddate = exports.initDateWithTimezoneFormat(endDate, 'HH:mm');
@@ -17,10 +35,24 @@ exports.formatSuggestedDates = (startDate, endDate) => {
     return `${new_startdate}-${new_enddate}`;
 }
 
+/**
+ * Check if a given date is between a date range
+ * @param {String} date 
+ * @param {String} startRange 
+ * @param {String} endRange
+ * @returns {String}
+ */
 exports.isBetweenTwoDates = (date, startRange, endRange) => {
     return moment(date).isBetween(startRange, endRange, null, '[]');
 }
 
+/**
+ * Format user's input available time to ISO String
+ * @param {String} startDate 
+ * @param {Integer} diffDate 
+ * @param {Array} available_time 
+ * @returns {Array}
+ */
 exports.formatDateWithTime = (startDate, diffDate, available_time) => {
     let range = [];
 
@@ -43,20 +75,12 @@ exports.formatDateWithTime = (startDate, diffDate, available_time) => {
     return Promise.all(range);
 }
 
-exports.createSuggestedDate = (start, end, duration) => {
-    let min = exports.initDateWithTimezone(start).hour();
-    let max = exports.initDateWithTimezone(end).hour();
-
-    let randomTime = Math.floor(Math.random() * (max - min)) + min;
-    let newStart = exports.initDateWithTimezone(start).set({ 'hour': randomTime });
-    let newEnd = exports.initDateWithTimezone(newStart).set({ 'minutes': duration });
-
-    return {
-        startDate: newStart.toISOString(),
-        endDate: newEnd.toISOString()
-    }
-}
-
+/**
+ * Create an array of time slots base of user's input duration.
+ * @param {Object} range 
+ * @param {Integer} duration 
+ * @returns {Array}
+ */
 exports.createTimeSlots = (range, duration) => { 
     let timeslots = []; 
     let newStartDate = exports.initDateWithTimezone(range.startDate); 
