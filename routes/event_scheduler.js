@@ -67,28 +67,32 @@ exports.registerRoutes = function (app, config) {
 
             return Promise.each(dateRange, (range) => {
                 let all_events = [];
-                
+
                 return Promise.each(all_users, (token) => {
                     oauth2Client.credentials = { 'access_token': token.ac_token };
 
                     return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate)
                         .then((events) => {
-                            events.events.forEach((events) => {
-                                all_events.push(events);
-                            });
+                            all_events = all_events.concat(events.events);
                         });
                 })
                 .then(() => {
-                    Promise.all(all_events)
-                        .then((events) => {
-                            return ev_controler.searchDateAvailability(events, range, duration);
-                        })
-                        .then((dt) => {
-                            if (!dt) return;
-                            
-                            let suggested = date_helper.formatSuggestedDates(dt.startDate, dt.endDate);
-                            suggestedDates.push(suggested);
-                        });
+                    let timeslots = date_helper.createTimeSlots(range, duration);
+
+                    return Promise.props({
+                        events: all_events,
+                        slots: timeslots
+                    })
+                    .then((props) => {
+                        return ev_controler.findAvailableSlots(props.events, props.slots);
+
+                    })
+                    .map((dt) => {
+                        return date_helper.formatSuggestedDates(dt.startDate, dt.endDate);
+                    });
+                })
+                .then((slots) => {
+                    suggestedDates = suggestedDates.concat(slots);
                 });
             })
             .then(() => {
@@ -113,7 +117,8 @@ exports.registerRoutes = function (app, config) {
                 });
                 return;
             }
-        }).catch((e) => {
+        })
+        .catch((e) => {
             console.log(e);
             res.json({
                 status: 'error',
