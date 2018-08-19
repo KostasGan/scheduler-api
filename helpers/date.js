@@ -56,3 +56,26 @@ exports.createSuggestedDate = (start, end, duration) => {
         endDate: newEnd.toISOString()
     }
 }
+
+exports.createTimeSlots = (range, duration) => {
+    let timeslots = [];
+    let newStartDate = exports.initDateWithTimezone(range.startDate);
+    let newEndDate = exports.initDateWithTimezone(range.startDate).add(duration, 'minutes');
+    let newDateIsInRangeDates = exports.isBetweenTwoDates(newEndDate, range.startDate, range.endDate);
+
+    do{
+        if (newDateIsInRangeDates) {
+            timeslots.push({
+                startDate: newStartDate,
+                endDate: newEndDate
+            });
+            
+            newStartDate = exports.initDateWithTimezone(newEndDate);
+            newEndDate = exports.initDateWithTimezone(newEndDate).add(duration, 'minutes');
+            newDateIsInRangeDates = exports.isBetweenTwoDates(newEndDate, range.startDate, range.endDate);
+        }
+    } 
+    while (newDateIsInRangeDates);
+
+    return new Promise.all(timeslots);
+}
