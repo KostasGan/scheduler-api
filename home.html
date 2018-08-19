@@ -152,6 +152,13 @@
         .popover button{
             margin: auto 5px;
         }
+        ul{
+            list-style: none;
+            column-gap: 0px;
+            column-rule-width: 0px;
+            padding: 0px;
+            margin: 0px;
+        }
     </style>
     <script>
         var CLIENT_ID = '22469461720-5s0vadaqi6cli0vpe4b0268b20huc20l.apps.googleusercontent.com';
@@ -225,11 +232,11 @@
                     }
                     else if (response.data.length > 0) {
                         let message = 'Suggested Dates are:\n';
-
+                        let list = '';
                         response.data.forEach(function (dates) {
-                            message = message + '<li >' + dates + '</li>';
+                            list = list + '<li >' + dates + '</li>';
                         });
-                        document.getElementById('resp_msg').innerHTML = message;
+                        document.getElementById('resp_msg').innerHTML = message + '<ul style="columns: 150px">' + list + '</ul>';
                         document.getElementById('resp_msg').style.color = 'black';
                     }
                     else {
