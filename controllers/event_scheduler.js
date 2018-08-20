@@ -60,7 +60,6 @@ exports.findAvailableSlots = (events, timeslots) => {
         });
 
         return Promise.all(indexes).then((index) => {
-            console.log(indexes);
             for (i = index.length; i > 0; i--) {
                 timeslots.splice(index[i - 1], 1);
             }
