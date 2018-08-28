@@ -32,7 +32,8 @@ exports.registerRoutes = function (app, config) {
             return [];
         });
 
-        Promise.all(all_users).filter((user) => {
+        Promise.all(all_users)
+        .filter((user) => {
             oauth2Client.credentials = { 'access_token': user.ac_token };
             return auth.checkAuthToken(oauth2Client).then((val) => {
                 if (val === 'Invalid Credentials') {
@@ -113,7 +114,8 @@ exports.registerRoutes = function (app, config) {
                 });
                 return;
             }
-        }).catch((e) => {
+        })
+        .catch((e) => {
             console.log(e);
             res.json({
                 status: 'error',

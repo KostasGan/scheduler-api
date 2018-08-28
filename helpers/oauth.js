@@ -24,35 +24,30 @@ exports.authorizeClient = (oauth2Client) => {
 
     return new Promise((resolve, reject) => {
         request.post(options, function (error, response, body) {
-            if (!error && response.statusCode === 200) {
-                let data = JSON.parse(body);
+            if (error || response.statusCode !== 200) return reject('error');
 
-                if (data.audience === oauth2Client.clientId_) {
-                    userModel.findUser(data.email).then((user) => {
-                        if (user && user.ac_token !== access_token) {
-                            userModel.UpdateUser(data.email, access_token);
-                            resolve('validated');
-                        } else if (user && user.ac_token === access_token) {
-                            resolve('validated');
-                        } else {
-                            userModel.CreateUser(data.email, access_token).then((val) => {
-                                if (val === 'Failed') {
-                                    reject('error');
-                                }
+            let data = JSON.parse(body);
 
-                                resolve('validated');
-                            });
-                        }
-                    }).catch((e) => {
-                        console.log(e);
-                        reject('error');
-                    });
-                } else {
-                    reject('error');
+            if (data.audience !== oauth2Client.clientId_) return reject('error');
+            
+            userModel.findUser(data.email).then((user) => {
+                if (user && user.ac_token !== access_token) {
+                    userModel.UpdateUser(data.email, access_token);
+                    return resolve('validated');
                 }
-            } else {
+
+                if (user && user.ac_token === access_token) return resolve('validated');
+                
+                userModel.CreateUser(data.email, access_token).then((val) => {
+                    if (val === 'Failed') return reject('error');
+
+                    return resolve('validated');
+                });
+            })
+            .catch((e) => {
+                console.log(e);
                 reject('error');
-            }
+            });
         });
     });
 }
