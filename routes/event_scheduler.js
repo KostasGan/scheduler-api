@@ -108,7 +108,7 @@ exports.registerRoutes = function (app, config) {
             } else {
                 res.json({
                     status: 'success',
-                    message: 'Unavailable Dates',
+                    message: 'Δεν υπάρχουν διαθέσιμες ημερομηνίες. Δοκιμάστε ξανά με νέα στοιχεία!',
                     data: suggested_dates
                 });
                 return;

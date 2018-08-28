@@ -29,17 +29,22 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
 }
 
 exports.searchDateAvailability = (events, range, duration) => {
-    if (events.length === 0) {
-        let new_date = date_helper.createSuggestedDate(range.startDate, range.endDate, duration);
+    let new_date = date_helper.createSuggestedDate(range.startDate, duration);
+    let newDateIsInRangeDates = date_helper.isBetweenTwoDates(new_date.endDate, range.startDate, range.endDate);
 
-        return Promise.resolve(new_date);
-    } else if (events.length > 0) {
-        let new_date;
+    if (!newDateIsInRangeDates) return Promise.resolve(null);
+    if (events.length === 0) return Promise.resolve(new_date);
+
+    if (events.length > 0) {
         let availability = true;
 
         do {
+            if (!newDateIsInRangeDates){
+                availability = true;
+                return;
+            };
+
             let no_available = 0;
-            new_date = date_helper.createSuggestedDate(range.startDate, range.endDate, duration);
 
             events.forEach((event) => {
                 let newDateStartisBetweenEventStart = date_helper.isBetweenTwoDates(new_date.startDate, event.startDate, event.endDate);
@@ -47,21 +52,19 @@ exports.searchDateAvailability = (events, range, duration) => {
                 let EventStartIsBetweenNewDate = date_helper.isBetweenTwoDates(event.startDate, new_date.startDate, new_date.endDate);
                 let EventEndIsBetweenNewDate = date_helper.isBetweenTwoDates(event.endDate, new_date.startDate, new_date.endDate);
 
-                if (!((!newDateStartisBetweenEventStart || !newDateEndisBetweenEventEnd) && (!EventStartIsBetweenNewDate || !EventEndIsBetweenNewDate))) {
+                if (!((!newDateStartisBetweenEventStart || !newDateEndisBetweenEventEnd) && (!EventStartIsBetweenNewDate || !EventEndIsBetweenNewDate))) { 
                     no_available++;
                     return;
                 }
-                return;
             });
 
-            let newDateIsInRangeDates = date_helper.isBetweenTwoDates(new_date.endDate, range.startDate, range.endDate);
-
-            if (no_available > 0 || !newDateIsInRangeDates){
-                availability = false;
-            } else {
+            if(no_available === 0){
                 availability = true;
+            } else {
+                availability = false;
+                new_date = date_helper.createSuggestedDate(new_date.endDate, duration);
+                newDateIsInRangeDates = date_helper.isBetweenTwoDates(new_date.endDate, range.startDate, range.endDate);
             }
-
         }
         while (!availability);
 
