@@ -20,8 +20,7 @@ exports.registerRoutes = function (app, config) {
                     'message': 'Invitation E-mail Sent Successfully'
                 });
                 return;
-            }
-            else {
+            } else {
                 res.json({
                     'status': 'error',
                     'message': "We can't send the invitation E-mail. Try again later!"
