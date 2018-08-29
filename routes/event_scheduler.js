@@ -74,9 +74,7 @@ exports.registerRoutes = function (app, config) {
 
                     return ev_controler.GetCalendarEvents(oauth2Client, range.startDate, range.endDate)
                         .then((events) => {
-                            events.events.forEach((events) => {
-                                all_events.push(events);
-                            });
+                            all_events = all_events.concat(events.events);
                         });
                 })
                 .then(() => {
@@ -87,23 +85,33 @@ exports.registerRoutes = function (app, config) {
                         .then((dt) => {
                             if (!dt) return;
                             
-                            let suggested = date_helper.formatSuggestedDates(dt.startDate, dt.endDate);
-                            suggestedDates.push(suggested);
+                            suggestedDates = suggestedDates.concat(dt);
                         });
                 });
             })
             .then(() => {
-                return new Promise.all(suggestedDates);
+                return Promise.all(suggestedDates).then((suggestedDates) => {
+                    if (!suggestedDates || suggestedDates.length === 0) return [];
+
+                    oauth2Client.credentials = { 'access_token': access_token };
+                    return ev_controler.CreateNewEvent(oauth2Client, suggestedDates[0], attendees).then((res) => {
+                        if (res === 'failed') return [];
+                        
+                        return new Promise.resolve(suggestedDates);
+                    });
+                });
             });
         })
         .then((suggested_dates) => {
             if(!suggested_dates) return;
 
             if (suggested_dates.length > 0) {
+                let suggested = date_helper.formatSuggestedDates(suggested_dates[0].startDate, suggested_dates[0].endDate);
+                
                 res.json({
                     status: 'success',
-                    message: 'Suggested Dates',
-                    data: suggested_dates
+                    message: 'Event Created',
+                    data: [suggested]
                 });
                 return;
             } else {

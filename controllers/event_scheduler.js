@@ -28,6 +28,46 @@ exports.GetCalendarEvents = (oauth2Client, startDate, endDate) => {
     });
 }
 
+
+exports.CreateNewEvent = (oauth2Client, dates, attendees) => {
+
+    let att = attendees.split(',');
+    let attendeesArray = [];
+
+    att.forEach((attendee) => {
+        attendeesArray.push({'email': attendee});
+    });
+    let event = {
+        'summary': 'New Meeting',
+        'location': 'Athens',
+        'description': 'New invitation for a meeting',
+        'start': {
+          'dateTime': dates.startDate,
+          'timeZone': 'Europe/Athens',
+        },
+        'end': {
+          'dateTime': dates.endDate,
+          'timeZone': 'Europe/Athens',
+        },
+        'attendees': attendeesArray
+    };
+    return new Promise((resolve, reject) =>{
+        calendar.events.insert({
+            auth: oauth2Client,
+            calendarId: 'primary',
+            sendNotifications: true,
+            resource: event
+        }, function (err, event) {
+            if (err) {
+                console.log('There was an error contacting the Calendar service: ' + err);
+                return resolve('failed');
+            }
+            console.log('Event created: %s', event.htmlLink);
+            return resolve('success');
+        });
+    });
+}
+
 exports.searchDateAvailability = (events, range, duration) => {
     let new_date = date_helper.createSuggestedDate(range.startDate, duration);
     let newDateIsInRangeDates = date_helper.isBetweenTwoDates(new_date.endDate, range.startDate, range.endDate);

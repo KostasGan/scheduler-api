@@ -156,9 +156,8 @@
             list-style: none;
             padding: 0px;
         }
-        h6{
-            margin-bottom: 10px;
-            padding-left: 0px;
+        #resp_msg{
+            font-size: 13px;
         }
     </style>
     <script>
@@ -232,12 +231,12 @@
                         document.getElementById('resp_msg').innerHTML = response.message;
                     }
                     else if (response.data.length > 0) {
-                        let message = '<h6> Suggested Dates are: </h6>';
-                        let list = '';
+                        let message = '<span> A new event created at: </span>';
+                        let suggested_date = '';
                         response.data.forEach(function (dates) {
-                            list = list + '<li>' + dates + '</li>';
+                            suggested_date = suggested_date + '<span style="font-weight:bold">' + dates + '</span>';
                         });
-                        document.getElementById('resp_msg').innerHTML = message + '<ul style="columns: 150px">' + list + '</ul>';
+                        document.getElementById('resp_msg').innerHTML = message + '<br>' + suggested_date + '<br>' + 'Email Invitation to Atteendees was sent successfully';
                         document.getElementById('resp_msg').style.color = 'black';
                     }
                     else {
