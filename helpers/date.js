@@ -40,7 +40,7 @@ exports.formatDateWithTime = (startDate, diffDate, available_time) => {
             });
         }
     }
-    return Promise.all(range);
+    return range;
 }
 
 exports.createSuggestedDate = (start, duration) => {
