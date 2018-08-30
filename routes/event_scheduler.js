@@ -87,12 +87,11 @@ exports.registerRoutes = function (app, config) {
                             if (!suggestedDates || suggestedDates.length === 0) return [];
 
                             oauth2Client.credentials = { 'access_token': access_token };
-                            return suggestedDates;
-                            // return ev_controler.CreateNewEvent(oauth2Client, suggestedDates[0], attendees).then((res) => {
-                            //     if (res === 'failed') return [];
+                            return ev_controler.CreateNewEvent(oauth2Client, suggestedDates[0], attendees).then((res) => {
+                                if (res === 'failed') return [];
 
-                            //     return suggestedDates;
-                            // });
+                                return suggestedDates;
+                            });
                         });
                 });
             })
