@@ -31,17 +31,19 @@ exports.authorizeClient = (oauth2Client) => {
             if (data.audience !== oauth2Client.clientId_) return reject('error');
             
             userModel.findUser(data.email).then((user) => {
-                if (user && user.ac_token !== access_token) {
-                    userModel.UpdateUser(data.email, access_token);
-                    return resolve('validated');
+                let invitation = user ? user.pending_invitation : false;
+
+                if (user) {
+                    userModel.UpdateUser(data.email, access_token, false);
+                    return resolve(invitation);
                 }
 
-                if (user && user.ac_token === access_token) return resolve('validated');
+                // if (user && user.ac_token === access_token) return resolve(invitation);
                 
                 userModel.CreateUser(data.email, access_token).then((val) => {
                     if (val === 'Failed') return reject('error');
 
-                    return resolve('validated');
+                    return resolve(invitation);
                 });
             })
             .catch((e) => {

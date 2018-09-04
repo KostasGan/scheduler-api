@@ -8,7 +8,8 @@ let new_user;
 const UserSchema = new Schema({
     email: { type: String, required: true },
     ac_token: { type: String, required: true },
-    friends_list: { type: [String] }
+    friends_list: { type: [String] },
+    pending_invitation: { type: Boolean, default: false}
 });
 
 UserSchema.statics.findUser = function(email) {
@@ -29,17 +30,18 @@ UserSchema.statics.findUserByAccessToken = function(access_token) {
     });
 }
 
-UserSchema.statics.UpdateUser = (email,token) => {
-    user.update({ email: email }, {ac_token: token}).then((response) => {
-        console.log(response);
-    });
+UserSchema.statics.UpdateUser = (email, token, invitation) => {
+    invitation = invitation || false;
+
+    user.update({ email: email }, {'$set': {'ac_token': token, 'pending_invitation': invitation}}).then((x) => { return });
 }
 
-UserSchema.statics.CreateUser = (email, access_token, friends_list) => {
+UserSchema.statics.CreateUser = (email, access_token, friends_list, pending_invitation) => {
     new_user = new user({ 
         email: email, 
         ac_token: access_token, 
-        friends_list: friends_list || []
+        friends_list: friends_list || [],
+        pending_invitation: pending_invitation || false
     });
     
     return new_user.save().then(() => {
@@ -57,7 +59,7 @@ UserSchema.statics.findFriendsAccessToken = (friends_emails) => {
         return user.findUser(friend_mail).then((friend) => {
             if(friend === null){
                 console.log('Create New User');
-                return user.CreateUser(friend_mail, ' ', []);
+                return user.CreateUser(friend_mail, ' ', [], true);
             }
             else{
                 return friend;

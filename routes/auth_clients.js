@@ -7,20 +7,25 @@ exports.registerRoutes = function (app, config) {
         let oauth2Client = auth.initGoogleAuth(config);
         oauth2Client.credentials = { 'access_token': access_token };
 
-        auth.authorizeClient(oauth2Client).then(() => {
-            res.status(200);
-            res.json({
-                status: 'success',
-                message: 'User is valid.'
+        auth.authorizeClient(oauth2Client)
+            .then((invitation) => {
+                res.status(200);
+                res.json({
+                    status: 'success',
+                    message: 'User is valid.',
+                    data: {
+                        pending_invitation : invitation
+                    }
+                });
+                return;
+            }).catch(() => {
+                res.status(400);
+                res.json({
+                    status: 'error',
+                    message: 'Bad Request. Please try again!',
+                    data: {}
+                });
+                return;
             });
-            return;
-        }).catch(() => {
-            res.status(400);
-            res.json({
-                status: 'error',
-                message: 'Bad Request. Please try again!'
-            });
-            return;
-        });
     });
 }

@@ -7,6 +7,7 @@
   <meta charset='utf-8' />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <link rel="stylesheet" type="text/css" href="site-assets/css/login-page.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
   <script async defer src="https://apis.google.com/js/platform.js?onload=handleClientLoad"></script>
   <script type="text/javascript">
     // Client ID and API key from the Developer Console
@@ -15,8 +16,13 @@
     // Authorization scopes required by the API; multiple scopes can be
     // included, separated by spaces.
     var SCOPES = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.readonly';
-    var api = 'http://35.190.151.137:8080';
+    var api = 'http://localhost:8080';
 
+    function showMessage() {
+      $('#authorize-button').hide();
+      $('#message').html('Thank you for the participation. You will be informed with a new Email about the new event!');
+    }
+    
     function onSuccess(googleUser) {
       let access_token = googleUser.getAuthResponse(true).access_token;
 
@@ -26,6 +32,11 @@
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
           let response = JSON.parse(xhr.response);
+
+          if(response.data && response.data.pending_invitation){
+            showMessage();
+            return;
+          }
 
           if (response.status === 'success') {
             let exp;
@@ -93,11 +104,16 @@
   <!--Add buttons to initiate auth sequence and sign out-->
   <div class="flex">
     <div class="box-login">
-      <img src="calendar-clock-icon.png" width="100" height="100">
-      <h1>Event Scheduler</h1>
-      <div id="authorize-button"> </div>
       <div>
-        <span id="error"></span>
+        <img src="calendar-clock-icon.png" width="100" height="100">
+        <h1>Event Scheduler</h1>
+        <div id="authorize-button"> </div>
+        <div>
+            <div style="margin-top:30px"> <span style="font-style: italic; font-size: 18px" id="message"> </span></div>
+          </div>
+        <div>
+          <span id="error"></span>
+        </div>
       </div>
     </div>
   </div>

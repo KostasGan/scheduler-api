@@ -119,7 +119,7 @@ exports.CreateNewEvent = (oauth2Client, dates, attendees) => {
                 console.log('There was an error contacting the Calendar service: ' + err);
                 return resolve('failed');
             }
-            console.log('Event created: %s', event.htmlLink);
+            
             return resolve('success');
         });
     });

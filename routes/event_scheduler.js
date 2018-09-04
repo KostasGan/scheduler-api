@@ -37,6 +37,7 @@ exports.registerRoutes = function (app, config) {
                 oauth2Client.credentials = { 'access_token': user.ac_token };
                 return auth.checkAuthToken(oauth2Client).then((val) => {
                     if (val === 'Invalid Credentials') {
+                        userModel.UpdateUser(user.email, user.ac_token, true);
                         return user.email;
                     }
                     return;
@@ -47,6 +48,7 @@ exports.registerRoutes = function (app, config) {
             })
             .then((unAuthUsers) => {
                 if (unAuthUsers.length > 0) {
+                    
                     res.status(401);
                     res.json({
                         status: 'error',
