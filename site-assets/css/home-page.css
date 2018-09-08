@@ -87,7 +87,6 @@ i {
 
 .logout {
     flex: 10%;
-    text-align: end;
     padding-right: 10px;
     max-width: initial
 }
