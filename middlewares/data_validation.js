@@ -6,7 +6,7 @@ const join = Promise.join;
 exports.accessTokenValidation = (req, res, next) => {
     let access_token = req.get('X-Access-Token') ? req.get('X-Access-Token').trim() : '';
     
-    if (access_token === '' || access_token.length < 125) {
+    if (access_token === '' || access_token.length < 115) {
         res.json({
             status: 'error',
             message: 'Bad Request. Wrong Access Token. Please try to login again!'
